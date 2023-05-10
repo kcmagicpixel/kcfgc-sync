@@ -1,0 +1,20 @@
+{
+  "name": "@emily-curry/fgc-sync-common",
+  "version": "0.0.0",
+  "private": true,
+  "author": "Emily Curry <emily@curry.sh>",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "source": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "dependencies": {
+    "zod": "^3.21.4"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0"
+  }
+}
