@@ -19,6 +19,10 @@ Run to build everything in watch mode during development:
 npm run watch
 ```
 
+## CI/CD
+
+To add a tournament to the automatically generated list of tournaments, add its slug to [auto.txt](./auto.txt).
+
 ## Packages
 
 ### [common](packages/common/)

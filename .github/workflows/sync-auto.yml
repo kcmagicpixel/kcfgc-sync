@@ -1,0 +1,24 @@
+name: auto-sync-start-gg
+run-name: Auto-sync start.gg
+on:
+  push:
+    branches:
+      - "main"
+
+jobs:
+  read-auto:
+    runs-on: ubuntu-20.04
+    outputs:
+      TOURNAMENT_IDS: ${{ steps.step1.outputs.TOURNAMENT_IDS }}
+    steps:
+      - uses: actions/checkout@v3
+      - id: step1
+        name: Read tournament ids
+        run: echo "TOURNAMENT_IDS=$(cat auto.txt)" >> "$GITHUB_OUTPUT"
+  sync-auto:
+    uses: ./sync.yml
+    needs: read-auto
+    inputs:
+      TOURNAMENT_IDS: ${{ needs.read-auto.outputs.TOURNAMENT_IDS }}
+    secrets:
+      START_GG_API_KEY: ${{ secrets.START_GG_API_KEY }}
