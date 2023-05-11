@@ -8,7 +8,7 @@ on:
 
 jobs:
   read-tournament-ids:
-    name: Read Tournament Id list
+    name: Read Tournament Id List
     runs-on: ubuntu-20.04
     outputs:
       TOURNAMENT_IDS: ${{ steps.step1.outputs.TOURNAMENT_IDS }}
