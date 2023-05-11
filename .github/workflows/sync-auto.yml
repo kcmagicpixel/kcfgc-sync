@@ -16,7 +16,7 @@ jobs:
         name: Read tournament ids
         run: echo "TOURNAMENT_IDS=$(cat auto.txt)" >> "$GITHUB_OUTPUT"
   sync-auto:
-    uses: ./sync.yml
+    uses: ./.github/workflows/sync.yml
     needs: read-auto
     inputs:
       TOURNAMENT_IDS: ${{ needs.read-auto.outputs.TOURNAMENT_IDS }}
