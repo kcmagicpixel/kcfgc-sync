@@ -2,10 +2,11 @@
   "compilerOptions": {
     "strict": true,
     "lib": ["ESNext"],
-    "target": "ES6",
-    "module": "CommonJS",
+    "target": "ESNext",
+    "module": "Node16",
     "declaration": true,
     "sourceMap": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "skipLibCheck": true
   }
 }
