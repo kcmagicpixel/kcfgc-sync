@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - id: step1
-        name: Read tournament ids
+        name: Read tournament id list
         run: echo "TOURNAMENT_IDS=$(cat auto.txt | tr '\n' ' ')" >> "$GITHUB_OUTPUT"
   sync-auto:
     uses: ./.github/workflows/sync.yml
