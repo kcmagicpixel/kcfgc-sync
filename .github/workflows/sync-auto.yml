@@ -18,7 +18,7 @@ jobs:
   sync-auto:
     uses: ./.github/workflows/sync.yml
     needs: read-auto
-    inputs:
+    with:
       TOURNAMENT_IDS: ${{ needs.read-auto.outputs.TOURNAMENT_IDS }}
     secrets:
       START_GG_API_KEY: ${{ secrets.START_GG_API_KEY }}
