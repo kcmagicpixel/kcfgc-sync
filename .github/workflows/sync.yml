@@ -1,5 +1,5 @@
-name: sync-start-gg
-run-name: Sync start.gg
+name: sync
+run-name: Sync
 on:
   workflow_call:
     inputs:
@@ -12,6 +12,7 @@ on:
 
 jobs:
   extract:
+    name: Extract Tournament Info
     runs-on: ubuntu-20.04
     env:
       START_GG_API_KEY: ${{ secrets.START_GG_API_KEY }}
