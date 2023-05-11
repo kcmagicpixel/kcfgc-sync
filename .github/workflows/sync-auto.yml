@@ -1,6 +1,7 @@
 name: auto-sync-start-gg
 run-name: Auto-sync start.gg
 on:
+  workflow_dispatch:
   push:
     branches:
       - "main"
