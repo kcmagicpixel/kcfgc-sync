@@ -1,9 +1,11 @@
-import { ArgumentParser } from "argparse";
 import { GGTournamentSchema } from "@emily-curry/fgc-sync-common";
-import fetch from "node-fetch";
-import { request, gql } from "graphql-request";
-import * as z from "zod";
+import { ArgumentParser } from "argparse";
+import { request } from "graphql-request";
 import { DateTime } from "luxon";
+import fetch from "node-fetch";
+import * as z from "zod";
+import { dashboardQuery } from "./query/dashboard-query.js";
+import { tournamentQuery } from "./query/tournament-query.js";
 
 const GQL_ENDPOINT = "https://api.start.gg/gql/alpha";
 const GQL_ENDPOINT_2 = "https://www.start.gg/api/-/gql";
@@ -35,96 +37,6 @@ if (!apiKey) {
   throw new Error("--apiKey is required");
 }
 
-const tournamentQuery = gql`
-  query TournamentQuery($slug: String) {
-    tournament(slug: $slug) {
-      id
-      name
-      startAt
-      endAt
-      timezone
-      events {
-        id
-        name
-        numEntrants
-        prizingInfo
-        rulesMarkdown
-        videogame {
-          id
-          name
-          images {
-            id
-            height
-            ratio
-            type
-            url
-            width
-          }
-        }
-        startAt
-        competitionTier
-        standings(query: { page: 0, perPage: 3 }) {
-          nodes {
-            id
-            isFinal
-            placement
-            standing
-            player {
-              id
-              gamerTag
-              prefix
-            }
-          }
-        }
-        phaseGroups {
-          bracketUrl
-          bracketType
-        }
-      }
-      url(relative: false)
-      venueAddress
-      venueName
-      rules
-      numAttendees
-      images(type: null) {
-        id
-        height
-        ratio
-        type
-        url
-        width
-      }
-      streams {
-        id
-        enabled
-        streamId
-        streamLogo
-        streamName
-        streamSource
-      }
-      publishing
-    }
-  }
-`;
-
-const dashboardQuery = gql`
-  query PageLayout($profileType: String!, $profileId: Int!, $page: String!) {
-    profileWidgetPageLayout(
-      profileType: $profileType
-      profileId: $profileId
-      page: $page
-    ) {
-      id
-      version
-      rows {
-        columns {
-          widgets
-        }
-      }
-    }
-  }
-`;
-
 let didError = false;
 
 const result: Array<z.infer<typeof GGTournamentSchema>> = [];
@@ -137,6 +49,7 @@ for (const tournamentId of tournamentIds) {
       { slug: tournamentId },
       { Authorization: `Bearer ${apiKey}` }
     );
+    console.log("request");
     const infoResponse = await fetch(infoEndpoint(tournamentId));
     const infoResult: Record<string, any> | undefined = infoResponse.ok
       ? ((await infoResponse.json()) as any)

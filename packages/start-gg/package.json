@@ -10,7 +10,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "exec": "node -r dotenv/config dist/index.js magic-pixel-weekly > ./out/tournaments.json"
+    "exec": "node -r dotenv/config dist/index.js magic-pixel-weekly magic-pixel-weekly-1 > ./out/tournaments.json"
   },
   "dependencies": {
     "@emily-curry/fgc-sync-common": "workspace:*",
