@@ -48,8 +48,10 @@ const tournamentQuery = gql`
         name
         numEntrants
         prizingInfo
+        rulesMarkdown
         videogame {
           id
+          name
           images {
             id
             height
@@ -58,7 +60,6 @@ const tournamentQuery = gql`
             url
             width
           }
-          name
         }
         startAt
         competitionTier
@@ -225,6 +226,7 @@ for (const tournamentId of tournamentIds) {
             registrationOptionValue?.fee > 0
               ? registrationOptionValue.fee
               : undefined,
+          rules: event.rulesMarkdown,
           prizing: event.prizingInfo.enablePrizing
             ? {
                 payoutType: event.prizingInfo.payoutType,

@@ -71,6 +71,7 @@ export const GGEventSchema = z.object({
   startDate: z.string().datetime({ offset: true }),
   competitionTier: z.number(),
   registrationFee: z.number().optional(),
+  rules: z.string().optional(),
   prizing: GGEventPrizingSchema.optional(),
   game: GGVideogameSchema,
   standings: z.array(GGStandingSchema).optional(),
