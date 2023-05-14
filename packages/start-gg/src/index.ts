@@ -182,10 +182,10 @@ for (const tournamentId of tournamentIds) {
       startDate: DateTime.fromSeconds(startAt).setZone(timezone).toISO(),
       endDate: DateTime.fromSeconds(endAt).setZone(timezone).toISO(),
       url,
-      address: venueAddress?.trim() || undefined,
-      venueName: venueName?.trim() || undefined,
+      address: venueAddress?.trim?.() || undefined,
+      venueName: venueName?.trim?.() || undefined,
       description: descriptionWidget?.config?.markdown,
-      rules: rules?.trim() || undefined,
+      rules: rules?.trim?.() || undefined,
       attendeeCount: tournament.numAttendees || undefined,
       slug: tournamentId,
       registrationFee: info?.registrationOptionValue?.find(
@@ -203,7 +203,7 @@ for (const tournamentId of tournamentIds) {
         return {
           id: stream?.id,
           streamId: stream?.streamId,
-          logo: stream?.streamLogo?.trim() || undefined,
+          logo: stream?.streamLogo?.trim?.() || undefined,
           name: stream?.streamName,
           source: stream?.streamSource,
         };
@@ -226,11 +226,11 @@ for (const tournamentId of tournamentIds) {
             registrationOptionValue?.fee > 0
               ? registrationOptionValue.fee
               : undefined,
-          rules: event.rulesMarkdown,
+          rules: event.rulesMarkdown?.trim?.() || undefined,
           prizing: event.prizingInfo.enablePrizing
             ? {
                 payoutType: event.prizingInfo.payoutType,
-                description: event.prizingInfo.markdown?.trim() || undefined,
+                description: event.prizingInfo.markdown?.trim?.() || undefined,
                 payouts: event.prizingInfo.prizing.map((prize: any) => {
                   if (!prize) return {};
                   return {
@@ -266,7 +266,7 @@ for (const tournamentId of tournamentIds) {
               player: {
                 id: standing.player.id,
                 name: standing.player.gamerTag,
-                prefix: standing.player.prefix?.trim() || undefined,
+                prefix: standing.player.prefix?.trim?.() || undefined,
               },
             };
           }),
