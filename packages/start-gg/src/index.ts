@@ -49,7 +49,6 @@ for (const tournamentId of tournamentIds) {
       { slug: tournamentId },
       { Authorization: `Bearer ${apiKey}` }
     );
-    console.log("request");
     const infoResponse = await fetch(infoEndpoint(tournamentId));
     const infoResult: Record<string, any> | undefined = infoResponse.ok
       ? ((await infoResponse.json()) as any)
@@ -140,6 +139,7 @@ for (const tournamentId of tournamentIds) {
               ? registrationOptionValue.fee
               : undefined,
           rules: event.rulesMarkdown?.trim?.() || undefined,
+          isPublished: event.publishing?.publish || false,
           prizing: event.prizingInfo.enablePrizing
             ? {
                 payoutType: event.prizingInfo.payoutType,

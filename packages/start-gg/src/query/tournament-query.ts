@@ -16,6 +16,7 @@ export const tournamentQuery = gql`
         rulesMarkdown
         startAt
         competitionTier
+        publishing
         videogame {
           id
           name
