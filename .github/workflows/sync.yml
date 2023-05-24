@@ -82,3 +82,5 @@ jobs:
           name: website-files
           path: content/events
       - run: git diff
+      - run: ls -al content
+      - run: ls -al content/events
