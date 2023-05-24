@@ -67,3 +67,18 @@ jobs:
         with:
           name: website-files
           path: output/*.md
+
+  upload-website:
+    name: Upload Website Files
+    runs-on: ubuntu-20.04
+    needs: generate-website
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: kcfgc/kcfgc.github.io
+      - name: Download website files output
+        uses: actions/download-artifact@v3
+        with:
+          name: website-files
+          path: content/events
+      - run: git diff
