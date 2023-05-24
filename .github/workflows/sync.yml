@@ -72,6 +72,8 @@ jobs:
     name: Upload Website Files
     runs-on: ubuntu-20.04
     needs: generate-website
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v3
         with:
@@ -81,6 +83,18 @@ jobs:
         with:
           name: website-files
           path: content/events
-      - run: git diff
-      - run: ls -al content
-      - run: ls -al content/events
+      - name: Stage changes
+        run: |
+          set +e
+          git add content/events
+          git diff --cached --exit-code
+          exitcode="$?"
+          echo "SHOULD_COMMIT=$exitcode" >> $GITHUB_ENV
+          exit 0
+      - name:
+        if: env.SHOULD_COMMIT == '1'
+        run: |
+          git config --global user.name 'KCFGC Bot'
+          git config --global user.email 'admin@kcfgc.com'
+          git commit -m "kcfgc-sync automatic generation"
+          git push
