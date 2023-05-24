@@ -1,0 +1,36 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug start.gg",
+      "skipFiles": ["<node_internals>/**"],
+      "cwd": "${workspaceFolder}/packages/start-gg",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "exec"],
+      "outFiles": ["${workspaceFolder}/packages/start-gg/dist/**/*.js"],
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/packages/start-gg/dist/**/*.js.map"
+      ],
+      "sourceMaps": true
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug website",
+      "skipFiles": ["<node_internals>/**"],
+      "cwd": "${workspaceFolder}/packages/website",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "exec"],
+      "outFiles": ["${workspaceFolder}/packages/website/dist/**/*.js"],
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/packages/website/dist/**/*.js.map"
+      ],
+      "sourceMaps": true
+    }
+  ]
+}
