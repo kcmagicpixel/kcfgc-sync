@@ -7,6 +7,7 @@ import * as z from "zod";
 import { DateTime } from "luxon";
 import { mapTournamentToOrg } from "./map-tournament-to-org";
 import { mapTournamentToSeries } from "./map-tournament-to-series";
+import { mapTournamentToTitle } from "./map-tournament-to-title";
 
 const TournamentListSchema = z.array(GGTournamentSchema);
 
@@ -32,7 +33,7 @@ const tournaments = TournamentListSchema.parse(JSON.parse(input));
 
 for (const tournament of tournaments) {
   const frontMatter = {
-    title: tournament.name,
+    title: mapTournamentToTitle(tournament),
     slug: tournament.slug,
     ref_org: mapTournamentToOrg(tournament),
     ref_banner: tournament.images.find((img) => img.type === "banner")?.url,
