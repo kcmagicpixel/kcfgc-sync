@@ -32,8 +32,38 @@ jobs:
         run: npm run build
       - name: Extract
         run: node packages/start-gg/dist/index.js ${{ inputs.TOURNAMENT_IDS }} > output/start-gg-tournaments.json
-      - name: Upload output
+      - name: Upload start.gg output
         uses: actions/upload-artifact@v3
         with:
           name: start-gg-tournaments.json
           path: output/start-gg-tournaments.json
+
+  generate-website:
+    name: Generate Website Files
+    runs-on: ubuntu-20.04
+    needs: extract
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Use Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build
+        run: npm run build
+      - name: Download start.gg output
+        uses: actions/download-artifact@v3
+        with:
+          name: start-gg-tournaments.json
+      - name: Generate website files
+        run: node packages/website/dist/index.js --out-dir=./output < start-gg-tournaments.json
+      - name: Upload website files output
+        uses: actions/upload-artifact@v3
+        with:
+          name: website-files
+          path: output/*.md
