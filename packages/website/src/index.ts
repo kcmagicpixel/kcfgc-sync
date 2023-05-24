@@ -32,6 +32,19 @@ const input = readFileSync(process.stdin.fd, { encoding: "utf-8" });
 const tournaments = TournamentListSchema.parse(JSON.parse(input));
 
 for (const tournament of tournaments) {
+  const events = tournament.events
+    .filter((ev) => ev.isPublished)
+    .sort((a, b) => a.startDate.localeCompare(b.startDate))
+    .map((ev) => {
+      return {
+        name: ev.game.name,
+        start_date: ev.startDate,
+        participant_count: ev.entrantCount,
+        entry_fee: ev.registrationFee,
+        rules: ev.rules,
+        url_bracket: ev.isPublished ? ev.brackets[0]?.url : undefined,
+      };
+    });
   const frontMatter = {
     title: mapTournamentToTitle(tournament),
     slug: tournament.slug,
@@ -47,19 +60,7 @@ for (const tournament of tournaments) {
     series: mapTournamentToSeries(tournament),
     rules: tournament.rules,
     stream: tournament.streams?.[0]?.name,
-    events: tournament.events
-      .filter((ev) => ev.isPublished)
-      .sort((a, b) => a.startDate.localeCompare(b.startDate))
-      .map((ev) => {
-        return {
-          name: ev.game.name,
-          start_date: ev.startDate,
-          participant_count: ev.entrantCount,
-          entry_fee: ev.registrationFee,
-          rules: ev.rules,
-          url_bracket: ev.isPublished ? ev.brackets[0]?.url : undefined,
-        };
-      }),
+    events: events.length > 0 ? events : undefined,
   };
   const yaml = stringify(frontMatter);
 
