@@ -92,7 +92,7 @@ jobs:
           exitcode="$?"
           echo "SHOULD_COMMIT=$exitcode" >> $GITHUB_ENV
           exit 0
-      - name:
+      - name: Commit changes
         if: env.SHOULD_COMMIT == '1'
         run: |
           git config --global user.name 'KCFGC Bot'
