@@ -25,3 +25,4 @@ jobs:
       TOURNAMENT_IDS: ${{ needs.read-tournament-ids.outputs.TOURNAMENT_IDS }}
     secrets:
       START_GG_API_KEY: ${{ secrets.START_GG_API_KEY }}
+      KCFGC_DEPLOY_KEY: ${{ secrets.KCFGC_DEPLOY_KEY }}

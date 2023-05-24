@@ -9,6 +9,8 @@ on:
     secrets:
       START_GG_API_KEY:
         required: true
+      KCFGC_DEPLOY_KEY:
+        required: true
 
 jobs:
   extract:
@@ -72,12 +74,11 @@ jobs:
     name: Upload Website Files
     runs-on: ubuntu-20.04
     needs: generate-website
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v3
         with:
           repository: kcfgc/kcfgc.github.io
+          ssh-key: "${{ secrets.KCFGC_DEPLOY_KEY }}"
       - name: Download website files output
         uses: actions/download-artifact@v3
         with:
