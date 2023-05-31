@@ -8,6 +8,9 @@ export const mapTournamentToSeries = (
   if (tournament.name.toLocaleLowerCase().includes("magic pixel weekly"))
     result.add("Magic Pixel Weekly");
 
+  if (tournament.name.toLocaleLowerCase().includes("sunday fight fest"))
+    result.add("Sunday Fight Fest");
+
   if (tournament.name.toLocaleLowerCase().includes("monthly"))
     result.add("Featured");
   if (tournament.slug === "kansas-k-o") result.add("Featured");
