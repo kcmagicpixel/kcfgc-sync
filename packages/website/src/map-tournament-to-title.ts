@@ -6,7 +6,7 @@ export const mapTournamentToTitle = (
   tournament: z.TypeOf<typeof GGTournamentSchema>
 ): string => {
   const series = mapTournamentToSeries(tournament);
-  if (series === "Magic Pixel Weekly") return series;
+  if (series.includes("Magic Pixel Weekly")) return "Magic Pixel Weekly";
 
   return tournament.name;
 };
