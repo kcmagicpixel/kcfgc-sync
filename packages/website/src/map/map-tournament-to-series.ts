@@ -14,6 +14,8 @@ export const mapTournamentToSeries = (
   if (tournament.name.toLocaleLowerCase().includes("monthly"))
     result.add("Featured");
   if (tournament.slug === "kansas-k-o") result.add("Featured");
+  if (tournament.slug.toLocaleLowerCase().includes("dsm-snapback"))
+    result.add("Featured");
 
   return [...result];
 };
