@@ -1,13 +1,17 @@
 import { GGTournamentSchema } from "@emily-curry/fgc-sync-common";
 import { ArgumentParser } from "argparse";
 import { readFileSync, writeFileSync } from "fs";
-import { stringify } from "yaml";
-import { resolve } from "path";
-import * as z from "zod";
 import { DateTime } from "luxon";
-import { mapTournamentToOrg } from "./map-tournament-to-org";
-import { mapTournamentToSeries } from "./map-tournament-to-series";
-import { mapTournamentToTitle } from "./map-tournament-to-title";
+import { resolve } from "path";
+import { stringify } from "yaml";
+import * as z from "zod";
+import {
+  mapTournamentToBanner,
+  mapTournamentToIcon,
+  mapTournamentToOrg,
+  mapTournamentToSeries,
+  mapTournamentToTitle,
+} from "./map";
 
 const TournamentListSchema = z.array(GGTournamentSchema);
 
@@ -49,8 +53,8 @@ for (const tournament of tournaments) {
     title: mapTournamentToTitle(tournament),
     slug: tournament.slug,
     ref_org: mapTournamentToOrg(tournament),
-    ref_banner: tournament.images.find((img) => img.type === "banner")?.url,
-    ref_icon: tournament.images.find((img) => img.type === "profile")?.url,
+    ref_banner: mapTournamentToBanner(tournament),
+    ref_icon: mapTournamentToIcon(tournament),
     url_startgg: tournament.url,
     address: tournament.address,
     venue_fee: tournament.registrationFee,
