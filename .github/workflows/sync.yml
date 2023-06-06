@@ -97,5 +97,5 @@ jobs:
         run: |
           git config --global user.name 'KCMP Bot'
           git config --global user.email 'admin@kcmagicpixel.com'
-          git commit -m "kcfgc-sync automatic generation"
+          git commit -m "chore: automatic sync"
           git push
