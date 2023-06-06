@@ -77,7 +77,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          repository: kcfgc/kcfgc.github.io
+          repository: kc-magic-pixel/kc-magic-pixel.github.io
           ssh-key: "${{ secrets.KCFGC_DEPLOY_KEY }}"
       - name: Download website files output
         uses: actions/download-artifact@v3
@@ -95,7 +95,7 @@ jobs:
       - name: Commit changes
         if: env.SHOULD_COMMIT == '1'
         run: |
-          git config --global user.name 'KCFGC Bot'
-          git config --global user.email 'admin@kcfgc.com'
+          git config --global user.name 'KCMP Bot'
+          git config --global user.email 'admin@kcmagicpixel.com'
           git commit -m "kcfgc-sync automatic generation"
           git push
