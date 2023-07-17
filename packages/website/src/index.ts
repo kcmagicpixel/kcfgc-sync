@@ -57,6 +57,7 @@ for (const tournament of tournaments) {
     ref_icon: mapTournamentToIcon(tournament),
     url_startgg: tournament.url,
     address: tournament.address,
+    venue_name: tournament.venueName,
     venue_fee: tournament.registrationFee,
     participant_count: tournament.attendeeCount,
     start_date: tournament.startDate,

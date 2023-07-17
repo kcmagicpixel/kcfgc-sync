@@ -100,6 +100,9 @@ const run = async () => {
       const descriptionWidget = widgets?.find(
         (w: any) => w?.id === "MarkdownWidget"
       );
+      const locationWidget = widgets?.find(
+        (w: any) => w?.id === "LocationWidget"
+      );
 
       const parsed = GGTournamentSchema.parse({
         id,
@@ -108,7 +111,10 @@ const run = async () => {
         endDate: DateTime.fromSeconds(endAt).setZone(timezone).toISO(),
         url,
         address: venueAddress?.trim?.() || undefined,
-        venueName: venueName?.trim?.() || undefined,
+        venueName:
+          locationWidget?.config?.venueName?.trim?.() ||
+          venueName?.trim?.() ||
+          undefined,
         description: descriptionWidget?.config?.markdown,
         rules: rules?.trim?.() || undefined,
         attendeeCount: tournament.numAttendees || undefined,
