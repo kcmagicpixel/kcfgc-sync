@@ -37,7 +37,7 @@ jobs:
     uses: ./.github/workflows/sync-hubs.yml
     needs: read-hub-ids
     with:
-      TOURNAMENT_IDS: ${{ needs.read-hub-ids.outputs.HUB_IDS }}
+      HUB_IDS: ${{ needs.read-hub-ids.outputs.HUB_IDS }}
     secrets:
       START_GG_API_KEY: ${{ secrets.START_GG_API_KEY }}
 
