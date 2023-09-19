@@ -15,6 +15,7 @@ export const loadHubs = async (apiKey: string, hubIds: string[]) => {
         hubQuery,
         {
           slug: `hub/${hubId}`,
+          perPage: 20,
         },
         { ["client-version"]: "20" }
       );

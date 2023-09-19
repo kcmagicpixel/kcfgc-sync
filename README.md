@@ -21,7 +21,7 @@ npm run watch
 
 ## CI/CD
 
-To add a tournament to the automatically generated list of tournaments, add its slug to [auto.txt](./auto.txt).
+To add a hub whose tournaments will automatically be discovered and synced to the website, add its slug to [auto-hubs.txt](./auto-hubs.txt). To add a one-off tournament to be synced, add its slug to [auto-tournaments.txt](./auto-tournaments.txt).
 
 ## Packages
 
