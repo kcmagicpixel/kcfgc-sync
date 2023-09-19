@@ -1,0 +1,39 @@
+name: sync-hubs
+run-name: Sync Hubs
+on:
+  workflow_call:
+    inputs:
+      HUB_IDS:
+        required: true
+        type: string
+    secrets:
+      START_GG_API_KEY:
+        required: true
+
+jobs:
+  extract:
+    name: Extract Hub Info
+    runs-on: ubuntu-20.04
+    env:
+      START_GG_API_KEY: ${{ secrets.START_GG_API_KEY }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Use Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build
+        run: npm run build
+      - name: Extract
+        run: node packages/start-gg/dist/index.js hubs ${{ inputs.HUB_IDS }} > output/start-gg-hubs.json
+      - name: Upload start.gg output
+        uses: actions/upload-artifact@v3
+        with:
+          name: start-gg-hubs.json
+          path: output/start-gg-hubs.json

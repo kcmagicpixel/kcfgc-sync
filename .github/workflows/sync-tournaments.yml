@@ -1,5 +1,5 @@
-name: sync
-run-name: Sync
+name: sync-tournaments
+run-name: Sync Tournaments
 on:
   workflow_call:
     inputs:
@@ -33,7 +33,7 @@ jobs:
       - name: Build
         run: npm run build
       - name: Extract
-        run: node packages/start-gg/dist/index.js ${{ inputs.TOURNAMENT_IDS }} > output/start-gg-tournaments.json
+        run: node packages/start-gg/dist/index.js tournaments ${{ inputs.TOURNAMENT_IDS }} > output/start-gg-tournaments.json
       - name: Upload start.gg output
         uses: actions/upload-artifact@v3
         with:

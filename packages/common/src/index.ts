@@ -98,3 +98,16 @@ export const GGTournamentSchema = z.object({
   images: z.array(GGImageSchema),
   streams: z.array(GGStreamSchema),
 });
+
+export const GGHubSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  slug: z.string(),
+  tournaments: z.array(
+    z.object({
+      id: z.number(),
+      name: z.string(),
+      slug: z.string(),
+    })
+  ),
+});

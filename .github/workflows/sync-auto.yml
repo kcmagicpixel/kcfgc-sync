@@ -14,18 +14,56 @@ jobs:
     name: Read Tournament Id List
     runs-on: ubuntu-20.04
     outputs:
-      TOURNAMENT_IDS: ${{ steps.step1.outputs.TOURNAMENT_IDS }}
+      TOURNAMENT_IDS: ${{ steps.output.outputs.TOURNAMENT_IDS }}
     steps:
       - uses: actions/checkout@v3
-      - id: step1
+      - id: output
         name: Output id list
-        run: echo "TOURNAMENT_IDS=$(cat auto.txt | tr '\n' ' ')" >> "$GITHUB_OUTPUT"
-  sync-auto:
-    name: Sync
-    uses: ./.github/workflows/sync.yml
-    needs: read-tournament-ids
+        run: echo "TOURNAMENT_IDS=$(cat auto-tournaments.txt | tr '\n' ' ')" >> "$GITHUB_OUTPUT"
+
+  read-hub-ids:
+    name: Read Hub Id List
+    runs-on: ubuntu-20.04
+    outputs:
+      HUB_IDS: ${{ steps.output.outputs.HUB_IDS }}
+    steps:
+      - uses: actions/checkout@v3
+      - id: output
+        name: Output id list
+        run: echo "HUB_IDS=$(cat auto-hubs.txt | tr '\n' ' ')" >> "$GITHUB_OUTPUT"
+
+  sync-hubs:
+    name: Sync Hubs
+    uses: ./.github/workflows/sync-hubs.yml
+    needs: read-hub-ids
     with:
-      TOURNAMENT_IDS: ${{ needs.read-tournament-ids.outputs.TOURNAMENT_IDS }}
+      TOURNAMENT_IDS: ${{ needs.read-hub-ids.outputs.HUB_IDS }}
+    secrets:
+      START_GG_API_KEY: ${{ secrets.START_GG_API_KEY }}
+
+  read-hub-tournament-ids:
+    name: Read Tournament Ids From Hubs
+    runs-on: ubuntu-20.04
+    needs: sync-hubs
+    outputs:
+      TOURNAMENT_IDS: ${{ steps.output.outputs.TOURNAMENT_IDS }}
+    steps:
+      - name: Download start.gg output
+        uses: actions/download-artifact@v3
+        with:
+          name: start-gg-hubs.json
+      - id: output
+        name: Output id list
+        run: echo "TOURNAMENT_IDS=$(jq --raw-output '.[].tournaments[].slug' < start-gg-hubs.json | tr '\n' ' ')" >> "$GITHUB_OUTPUT"
+
+  sync-tournaments:
+    name: Sync Tournaments
+    uses: ./.github/workflows/sync-tournaments.yml
+    needs:
+      - read-tournament-ids
+      - read-hub-tournament-ids
+    with:
+      TOURNAMENT_IDS: ${{ needs.read-tournament-ids.outputs.TOURNAMENT_IDS }} ${{ needs.read-hub-tournament-ids.outputs.TOURNAMENT_IDS }}
     secrets:
       START_GG_API_KEY: ${{ secrets.START_GG_API_KEY }}
       KCFGC_DEPLOY_KEY: ${{ secrets.KCFGC_DEPLOY_KEY }}

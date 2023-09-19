@@ -31,8 +31,20 @@ Contains the shared schema describing a tournament.
 
 ### [start-gg](packages/start-gg/)
 
-Utility for extracting tournament information from start.gg. Takes an `api-key` argument (can be omitted if the `START_GG_API_KEY` env variable is set), then a list of arguments that are the tournament slugs to extract. Writes to stdout.
+All commands take an `api-key` argument (can be omitted if the `START_GG_API_KEY` env variable is set).
+
+#### `tournaments`
+
+Utility for extracting tournament information from start.gg. Takes a list of arguments that are the tournament slugs to extract. Writes to stdout.
 
 ```sh
-node packages/start-gg/dist/index.js --api-key=mystartggapikey combo-breaker evo myothertournament
+node packages/start-gg/dist/index.js tournaments --api-key=mystartggapikey combo-breaker evo myothertournament
+```
+
+#### `hubs`
+
+Utility for extracting hub information from start.gg. Takes a list of arguments that are the hub slugs to extract. Writes to stdout.
+
+```sh
+node packages/start-gg/dist/index.js hubs --api-key=mystartggapikey magic-pixel myotherhub
 ```

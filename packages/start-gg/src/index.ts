@@ -1,27 +1,7 @@
-import { GGTournamentSchema } from "@emily-curry/fgc-sync-common";
 import { ArgumentParser } from "argparse";
-import { request } from "graphql-request";
-import { DateTime } from "luxon";
-import fetch from "node-fetch";
-import * as z from "zod";
-import { dashboardQuery } from "./query/dashboard-query.js";
-import { tournamentQuery } from "./query/tournament-query.js";
-
-const GQL_ENDPOINT = "https://api.start.gg/gql/alpha";
-const GQL_ENDPOINT_2 = "https://www.start.gg/api/-/gql";
-const infoEndpoint = (id: string, dataId: string) =>
-  `https://www.start.gg/_next/data/${dataId}/en-us/tournament/${id}/dashboard.json`;
 
 const parser = new ArgumentParser({
   description: "Pulls data from the start.gg API.",
-});
-
-parser.add_argument("ids", {
-  action: "append",
-  metavar: "id",
-  type: "str",
-  nargs: "+",
-  help: "the list of tournament ids to extract",
 });
 parser.add_argument("--api-key", {
   type: "str",
@@ -30,193 +10,39 @@ parser.add_argument("--api-key", {
   default: process.env["START_GG_API_KEY"],
 });
 
+const subparsers = parser.add_subparsers();
+
+const tournamentParser = subparsers.add_parser("tournaments");
+tournamentParser.add_argument("tournamentIds", {
+  action: "append",
+  metavar: "id",
+  type: "str",
+  nargs: "+",
+  help: "the list of tournament ids to extract",
+});
+
+const hubParser = subparsers.add_parser("hubs");
+hubParser.add_argument("hubIds", {
+  action: "append",
+  metavar: "id",
+  type: "str",
+  nargs: "+",
+  help: "the list of hub ids to extract",
+});
+
 const args = parser.parse_args();
+
 const apiKey = args.apiKey;
-const tournamentIds = args.ids[0];
 if (!apiKey) {
   throw new Error("--apiKey is required");
 }
 
-const getExtraInfo = async (
-  tournamentId: string,
-  dataId?: string
-): Promise<Record<string, any> | undefined> => {
-  if (!dataId) return undefined;
-  const infoResponse = await fetch(infoEndpoint(tournamentId, dataId));
-  if (!infoResponse.ok) return undefined;
-  return await infoResponse.json();
-};
-
-const run = async () => {
-  let didError = false;
-
-  const result: Array<z.infer<typeof GGTournamentSchema>> = [];
-
-  const homeResponse = await (await fetch("https://start.gg")).text();
-  const dataId = /<script src="\/assets.*\/(.*?)\/_buildManifest\.js/gim.exec(
-    homeResponse
-  )?.[1];
-
-  for (const tournamentId of tournamentIds) {
-    try {
-      const { tournament }: any = await request(
-        GQL_ENDPOINT,
-        tournamentQuery,
-        { slug: tournamentId },
-        { Authorization: `Bearer ${apiKey}` }
-      );
-      const infoResult = await getExtraInfo(tournamentId, dataId);
-
-      const info = infoResult?.pageProps?.fluxStoreData?.find(
-        (d: any) => d?.successAction === "TOURNAMENT_FETCHED"
-      )?.entities;
-
-      const {
-        timezone,
-        id,
-        name,
-        startAt,
-        endAt,
-        url,
-        venueAddress,
-        venueName,
-        rules,
-      } = tournament ?? {};
-
-      const { profileWidgetPageLayout }: any = await request(
-        GQL_ENDPOINT_2,
-        dashboardQuery,
-        {
-          page: "details",
-          profileType: "tournament",
-          profileId: id,
-        },
-        { ["client-version"]: "20" }
-      );
-
-      const widgets = profileWidgetPageLayout?.rows?.flatMap((row: any) => {
-        return row?.columns?.flatMap((col: any) => col?.widgets);
-      });
-      const descriptionWidget = widgets?.find(
-        (w: any) => w?.id === "MarkdownWidget"
-      );
-      const locationWidget = widgets?.find(
-        (w: any) => w?.id === "LocationWidget"
-      );
-
-      const parsed = GGTournamentSchema.parse({
-        id,
-        name,
-        startDate: DateTime.fromSeconds(startAt).setZone(timezone).toISO(),
-        endDate: DateTime.fromSeconds(endAt).setZone(timezone).toISO(),
-        url,
-        address: venueAddress?.trim?.() || undefined,
-        venueName:
-          locationWidget?.config?.venueName?.trim?.() ||
-          venueName?.trim?.() ||
-          undefined,
-        description: descriptionWidget?.config?.markdown,
-        rules: rules?.trim?.() || undefined,
-        attendeeCount: tournament.numAttendees || undefined,
-        slug: tournamentId,
-        registrationFee: info?.registrationOptionValue?.find(
-          (opt: any) => opt?.optionType === "tournament"
-        )?.fee,
-        isPublished: tournament.publishing?.publish || false,
-        isRegistrationOpen: tournament.publishing?.registration ?? false,
-        images:
-          tournament.images?.map((img: any) => {
-            return {
-              ...img,
-              id: parseInt(img?.id),
-            };
-          }) ?? [],
-        streams:
-          tournament.streams?.map((stream: any) => {
-            return {
-              id: stream?.id,
-              streamId: stream?.streamId,
-              logo: stream?.streamLogo?.trim?.() || undefined,
-              name: stream?.streamName,
-              source: stream?.streamSource,
-            };
-          }) ?? [],
-        events: tournament.events?.map((event: any) => {
-          if (!event) return {};
-          const registrationOptionValue = info?.registrationOptionValue?.find(
-            (opt: any) =>
-              opt?.optionType === "event" && opt?.optionTypeId === event.id
-          );
-          return {
-            id: event.id,
-            name: event.name,
-            entrantCount: event.numEntrants,
-            startDate: DateTime.fromSeconds(event.startAt)
-              .setZone(timezone)
-              .toISO(),
-            competitionTier: event.competitionTier,
-            registrationFee:
-              registrationOptionValue?.fee > 0
-                ? registrationOptionValue.fee
-                : undefined,
-            rules: event.rulesMarkdown?.trim?.() || undefined,
-            isPublished: event.publishing?.publish || false,
-            prizing: event.prizingInfo.enablePrizing
-              ? {
-                  payoutType: event.prizingInfo.payoutType,
-                  description:
-                    event.prizingInfo.markdown?.trim?.() || undefined,
-                  payouts: event.prizingInfo.prizing.map((prize: any) => {
-                    if (!prize) return {};
-                    return {
-                      id: prize.id,
-                      placement: prize.placement,
-                      percent: prize.percent,
-                    };
-                  }),
-                }
-              : undefined,
-            game: {
-              id: event.videogame.id,
-              name: event.videogame.name,
-              images: event.videogame.images?.map((img: any) => {
-                return {
-                  ...img,
-                  id: parseInt(img?.id),
-                };
-              }),
-            },
-            brackets: event.phaseGroups?.map((pg: any) => {
-              return {
-                url: pg?.bracketUrl,
-                type: pg?.bracketType,
-              };
-            }),
-            standings: event.standings?.nodes?.map((standing: any) => {
-              if (!standing) return {};
-              return {
-                id: standing.id,
-                standing: standing.standing,
-                placement: standing.placement,
-                player: {
-                  id: standing.player.id,
-                  name: standing.player.gamerTag,
-                  prefix: standing.player.prefix?.trim?.() || undefined,
-                },
-              };
-            }),
-          };
-        }),
-      });
-      result.push(parsed);
-    } catch (e) {
-      process.stderr.write((e as any)?.toString());
-      didError = true;
-    }
-  }
-
-  process.stdout.write(JSON.stringify(result));
-  if (didError) process.exit(1);
-};
-
-run();
+if (Array.isArray(args.tournamentIds?.[0])) {
+  const exec = require("./tournament").loadTournaments;
+  exec(apiKey, args.tournamentIds[0]);
+} else if (Array.isArray(args.hubIds?.[0])) {
+  const exec = require("./hub").loadHubs;
+  exec(apiKey, args.hubIds[0]);
+} else {
+  throw new Error("Cannot handle provided args!");
+}
