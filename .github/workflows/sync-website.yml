@@ -1,45 +1,12 @@
-name: sync-tournaments
-run-name: Sync Tournaments
+name: sync-website
+run-name: Sync Website
 on:
   workflow_call:
-    inputs:
-      TOURNAMENT_IDS:
-        required: true
-        type: string
     secrets:
-      START_GG_API_KEY:
-        required: true
       KCFGC_DEPLOY_KEY:
         required: true
 
 jobs:
-  extract:
-    name: Extract Tournament Info
-    runs-on: ubuntu-20.04
-    env:
-      START_GG_API_KEY: ${{ secrets.START_GG_API_KEY }}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 8
-      - name: Use Node.js 18
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: "pnpm"
-      - name: Install dependencies
-        run: pnpm install
-      - name: Build
-        run: npm run build
-      - name: Extract
-        run: node packages/start-gg/dist/index.js tournaments ${{ inputs.TOURNAMENT_IDS }} > output/start-gg-tournaments.json
-      - name: Upload start.gg output
-        uses: actions/upload-artifact@v3
-        with:
-          name: start-gg-tournaments.json
-          path: output/start-gg-tournaments.json
-
   generate-website:
     name: Generate Website Files
     runs-on: ubuntu-20.04

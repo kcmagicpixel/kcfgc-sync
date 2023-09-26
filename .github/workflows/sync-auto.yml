@@ -32,9 +32,9 @@ jobs:
         name: Output id list
         run: echo "HUB_IDS=$(cat auto-hubs.txt | tr '\n' ' ')" >> "$GITHUB_OUTPUT"
 
-  sync-hubs:
-    name: Sync Hubs
-    uses: ./.github/workflows/sync-hubs.yml
+  extract-hubs:
+    name: Extract Hubs
+    uses: ./.github/workflows/extract-hubs.yml
     needs: read-hub-ids
     with:
       HUB_IDS: ${{ needs.read-hub-ids.outputs.HUB_IDS }}
@@ -44,7 +44,7 @@ jobs:
   read-hub-tournament-ids:
     name: Read Tournament Ids From Hubs
     runs-on: ubuntu-20.04
-    needs: sync-hubs
+    needs: extract-hubs
     outputs:
       TOURNAMENT_IDS: ${{ steps.output.outputs.TOURNAMENT_IDS }}
     steps:
@@ -56,9 +56,9 @@ jobs:
         name: Output id list
         run: echo "TOURNAMENT_IDS=$(jq --raw-output '.[].tournaments[].slug' < start-gg-hubs.json | tr '\n' ' ')" >> "$GITHUB_OUTPUT"
 
-  sync-tournaments:
-    name: Sync Tournaments
-    uses: ./.github/workflows/sync-tournaments.yml
+  extract-tournaments:
+    name: Extract Tournaments
+    uses: ./.github/workflows/extract-tournaments.yml
     needs:
       - read-tournament-ids
       - read-hub-tournament-ids
@@ -66,4 +66,10 @@ jobs:
       TOURNAMENT_IDS: ${{ needs.read-tournament-ids.outputs.TOURNAMENT_IDS }} ${{ needs.read-hub-tournament-ids.outputs.TOURNAMENT_IDS }}
     secrets:
       START_GG_API_KEY: ${{ secrets.START_GG_API_KEY }}
-      KCFGC_DEPLOY_KEY: ${{ secrets.KCFGC_DEPLOY_KEY }}
+
+  sync-website:
+    name: Sync Website
+    uses: ./.github/workflows/sync-website.yml
+    needs: extract-tournaments
+    secrets:
+      START_GG_API_KEY: ${{ secrets.START_GG_API_KEY }}

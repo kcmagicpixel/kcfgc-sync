@@ -1,9 +1,9 @@
-name: sync-hubs
-run-name: Sync Hubs
+name: extract-tournaments
+run-name: Extract Tournaments
 on:
   workflow_call:
     inputs:
-      HUB_IDS:
+      TOURNAMENT_IDS:
         required: true
         type: string
     secrets:
@@ -12,7 +12,7 @@ on:
 
 jobs:
   extract:
-    name: Extract Hub Info
+    name: Extract Tournament Info
     runs-on: ubuntu-20.04
     env:
       START_GG_API_KEY: ${{ secrets.START_GG_API_KEY }}
@@ -31,9 +31,9 @@ jobs:
       - name: Build
         run: npm run build
       - name: Extract
-        run: node packages/start-gg/dist/index.js hubs ${{ inputs.HUB_IDS }} > output/start-gg-hubs.json
+        run: node packages/start-gg/dist/index.js tournaments ${{ inputs.TOURNAMENT_IDS }} > output/start-gg-tournaments.json
       - name: Upload start.gg output
         uses: actions/upload-artifact@v3
         with:
-          name: start-gg-hubs.json
-          path: output/start-gg-hubs.json
+          name: start-gg-tournaments.json
+          path: output/start-gg-tournaments.json
