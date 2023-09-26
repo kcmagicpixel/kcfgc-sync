@@ -10,7 +10,6 @@ jobs:
   generate-website:
     name: Generate Website Files
     runs-on: ubuntu-20.04
-    needs: extract
     steps:
       - uses: actions/checkout@v3
       - uses: pnpm/action-setup@v2
