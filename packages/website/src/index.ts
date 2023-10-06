@@ -43,9 +43,20 @@ for (const tournament of tournaments) {
     return {
       name: ev.game.name,
       start_date: ev.startDate,
+      participant_count: ev.entrantCount,
       entry_fee: ev.registrationFee,
       rules: ev.rules,
       url_bracket: ev.isPublished ? ev.brackets[0]?.url : undefined,
+      standings: [...(ev.standings ?? [])]
+        .sort((a, b) => b.standing - a.standing)
+        .map((st) => {
+          return {
+            player: st.player.name,
+            prefix: st.player.prefix,
+            standing: st.standing,
+          };
+        })
+        .slice(0, 3),
     };
   });
   const results = tournamentEvents
