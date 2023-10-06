@@ -48,7 +48,7 @@ for (const tournament of tournaments) {
       rules: ev.rules,
       url_bracket: ev.isPublished ? ev.brackets[0]?.url : undefined,
       standings: [...(ev.standings ?? [])]
-        .sort((a, b) => b.standing - a.standing)
+        .sort((a, b) => a.standing - b.standing)
         .map((st) => {
           return {
             player: st.player.name,
@@ -59,24 +59,6 @@ for (const tournament of tournaments) {
         .slice(0, 3),
     };
   });
-  const results = tournamentEvents
-    .map((ev) => {
-      return {
-        name: ev.game.name,
-        participant_count: ev.entrantCount,
-        standings: [...(ev.standings ?? [])]
-          .sort((a, b) => b.standing - a.standing)
-          .map((st) => {
-            return {
-              player: st.player.name,
-              prefix: st.player.prefix,
-              standing: st.standing,
-            };
-          })
-          .slice(0, 3),
-      };
-    })
-    .filter((i) => i.standings.length > 0);
   const frontMatter = {
     title: mapTournamentToTitle(tournament),
     slug: tournament.slug,
@@ -94,7 +76,6 @@ for (const tournament of tournaments) {
     rules: tournament.rules,
     stream: tournament.streams?.[0]?.name,
     events: events.length > 0 ? events : undefined,
-    results: results.length > 0 ? results : undefined,
   };
   const yaml = stringify(frontMatter);
 
