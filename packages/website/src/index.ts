@@ -57,7 +57,9 @@ for (const tournament of tournaments) {
           .sort((a, b) => b.standing - a.standing)
           .map((st) => {
             return {
-              player: st.player,
+              player: st.player.name,
+              prefix: st.player.prefix,
+              standing: st.standing,
             };
           })
           .slice(0, 3),
