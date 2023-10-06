@@ -53,7 +53,7 @@ for (const tournament of tournaments) {
       return {
         name: ev.game.name,
         participant_count: ev.entrantCount,
-        results: [...(ev.standings ?? [])]
+        standings: [...(ev.standings ?? [])]
           .sort((a, b) => b.standing - a.standing)
           .map((st) => {
             return {
@@ -65,7 +65,7 @@ for (const tournament of tournaments) {
           .slice(0, 3),
       };
     })
-    .filter((i) => i.results.length > 0);
+    .filter((i) => i.standings.length > 0);
   const frontMatter = {
     title: mapTournamentToTitle(tournament),
     slug: tournament.slug,
