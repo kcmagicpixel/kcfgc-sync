@@ -6,6 +6,7 @@ export const tournamentFragment = gql`
     name
     startAt
     endAt
+    createdAt
     timezone
     events {
       id

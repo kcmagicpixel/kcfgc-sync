@@ -84,6 +84,7 @@ export const GGTournamentSchema = z.object({
   name: z.string(),
   startDate: z.string().datetime({ offset: true }),
   endDate: z.string().datetime({ offset: true }),
+  createdDate: z.string().datetime({ offset: true }),
   url: z.string(),
   address: z.string().optional(),
   venueName: z.string().optional(),

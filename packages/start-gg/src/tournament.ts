@@ -53,6 +53,7 @@ export const loadTournaments = async (
         name,
         startAt,
         endAt,
+        createdAt,
         url,
         venueAddress,
         venueName,
@@ -85,6 +86,7 @@ export const loadTournaments = async (
         name,
         startDate: DateTime.fromSeconds(startAt).setZone(timezone).toISO(),
         endDate: DateTime.fromSeconds(endAt).setZone(timezone).toISO(),
+        createdDate: DateTime.fromSeconds(createdAt).setZone(timezone).toISO(),
         url,
         address: venueAddress?.trim?.() || undefined,
         venueName:

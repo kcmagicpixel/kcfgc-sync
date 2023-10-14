@@ -72,6 +72,7 @@ for (const tournament of tournaments) {
     participant_count: tournament.attendeeCount,
     start_date: tournament.startDate,
     end_date: tournament.endDate,
+    created_date: tournament.createdDate,
     series: mapTournamentToSeries(tournament),
     rules: tournament.rules,
     stream: tournament.streams?.[0]?.name,
