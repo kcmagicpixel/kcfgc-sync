@@ -11,8 +11,5 @@ export const mapTournamentToSeries = (
   if (tournament.name.toLocaleLowerCase().includes("magic pixel runback"))
     result.add("Magic Pixel Runback");
 
-  if (tournament.name.toLocaleLowerCase().includes("monthly"))
-    result.add("Featured");
-
   return [...result];
 };
