@@ -14,3 +14,22 @@ export const fetchDataId = async () => {
   if (!dataId) throw new Error("Could not parse dataId from home page!");
   return dataId;
 };
+
+export const withRetry = <T extends any[], R>(
+  fn: (...args: T) => Promise<R>,
+  count: number = 3,
+  throttle: number = 1000
+): ((...args: T) => Promise<R>) => {
+  return async (...args: T) => {
+    let retryCount = 0;
+    while (true) {
+      try {
+        return await fn(...args);
+      } catch (e) {
+        retryCount += 1;
+        if (retryCount >= count) throw e;
+        await new Promise((res) => setTimeout(res, throttle));
+      }
+    }
+  };
+};
