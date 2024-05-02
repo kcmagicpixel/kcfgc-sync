@@ -10,7 +10,7 @@ const loadHub = withRetry(async (hubId: string) => {
     hubQuery,
     {
       slug: `hub/${hubId}`,
-      perPage: 500,
+      perPage: 20,
     },
     { ["client-version"]: "20" }
   );
