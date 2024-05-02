@@ -77,6 +77,7 @@ for (const tournament of tournaments) {
     rules: tournament.rules,
     stream: tournament.streams?.[0]?.name,
     events: events.length > 0 ? events : undefined,
+    games: events.map((e) => e.name),
   };
   const yaml = stringify(frontMatter);
 
