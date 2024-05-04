@@ -139,16 +139,16 @@ const loadTournament = withRetry(
                 description: event.prizingInfo.markdown?.trim?.() || undefined,
                 payouts: event.prizingInfo.prizing.map((prize: any) => {
                   if (!prize) return {};
-                  const result: Record<string, string> = {
+                  return {
                     id: prize.id,
                     placement: prize.placement,
+                    amount:
+                      event.prizingInfo.payoutType === "percentage"
+                        ? prize.percent
+                        : event.prizingInfo.payoutType === "fixedAmount"
+                        ? prize.amount
+                        : undefined,
                   };
-                  if (event.prizingInfo.payoutType === "percentage") {
-                    result.percent = prize.percent;
-                  } else if (event.prizingInfo.payoutType === "fixedAmount") {
-                    result.amount = prize.amount;
-                  }
-                  return result;
                 }),
               }
             : undefined,
