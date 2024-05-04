@@ -23,17 +23,34 @@ export const GGVideogameSchema = z.object({
   images: z.array(GGImageSchema),
 });
 
-export const GGEventPrizingPayoutSchema = z.object({
-  id: z.number(),
-  placement: z.number(),
-  percent: z.number(),
+const GGEventPrizingPercentSchema = z.object({
+  payoutType: z.literal("percentage"),
+  description: z.string().optional(),
+  payouts: z.array(
+    z.object({
+      id: z.number(),
+      placement: z.number(),
+      percent: z.number(),
+    })
+  ),
 });
 
-export const GGEventPrizingSchema = z.object({
-  payoutType: z.enum(["percentage"]),
+const GGEventPrizingFixedSchema = z.object({
+  payoutType: z.literal("fixedAmount"),
   description: z.string().optional(),
-  payouts: z.array(GGEventPrizingPayoutSchema),
+  payouts: z.array(
+    z.object({
+      id: z.number(),
+      placement: z.number(),
+      amount: z.number(),
+    })
+  ),
 });
+
+export const GGEventPrizingSchema = z.discriminatedUnion("payoutType", [
+  GGEventPrizingFixedSchema,
+  GGEventPrizingPercentSchema,
+]);
 
 export const GGPlayerSchema = z.object({
   id: z.number(),

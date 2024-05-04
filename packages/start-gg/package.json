@@ -9,7 +9,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "exec:t": "node -r dotenv/config dist/index.js tournaments magic-pixel-weekly-10 magic-pixel-weekly-11 > ./out/tournaments.json",
+    "exec:t": "node -r dotenv/config dist/index.js tournaments magic-pixel-runback-16 > ./out/tournaments.json",
     "exec:h": "node -r dotenv/config dist/index.js hubs magic-pixel > ./out/hubs.json"
   },
   "dependencies": {
