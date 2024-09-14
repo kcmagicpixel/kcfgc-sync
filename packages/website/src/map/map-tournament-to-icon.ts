@@ -6,7 +6,12 @@ export const mapTournamentToIcon = (
   tournament: z.TypeOf<typeof GGTournamentSchema>
 ): string | undefined => {
   const series = mapTournamentToSeries(tournament);
-  if (series.includes("Magic Pixel Weekly")) return "images/mp_icon.png";
+  if (
+    series.includes("Magic Pixel Weekly") ||
+    series.includes("Magic Pixel Runback")
+  ) {
+    return "images/mp_icon.png";
+  }
 
   return tournament.images.find((img) => img.type === "profile")?.url;
 };
