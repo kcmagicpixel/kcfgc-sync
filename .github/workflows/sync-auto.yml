@@ -73,3 +73,11 @@ jobs:
     needs: extract-tournaments
     secrets:
       KCFGC_DEPLOY_KEY: ${{ secrets.KCFGC_DEPLOY_KEY }}
+
+  workflow-keepalive:
+    name: Disable Workflow Inactivity
+    if: github.event_name == 'schedule'
+    permissions:
+      actions: write
+    steps:
+      - uses: liskin/gh-workflow-keepalive@v1.2.1
