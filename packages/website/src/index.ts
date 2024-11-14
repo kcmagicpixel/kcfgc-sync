@@ -28,7 +28,6 @@ parser.add_argument("--out-dir", {
 
 const args = parser.parse_args();
 const outDir = resolve(process.cwd(), args.outDir);
-console.log("outDir:", outDir);
 if (!outDir) {
   throw new Error("--out-dir is required");
 }
