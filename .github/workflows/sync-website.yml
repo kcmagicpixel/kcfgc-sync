@@ -25,13 +25,13 @@ jobs:
       - name: Build
         run: npm run build
       - name: Download start.gg output
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: start-gg-tournaments.json
       - name: Generate website files
         run: node packages/website/dist/index.js --out-dir=./output < start-gg-tournaments.json
       - name: Upload website files output
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: website-files
           path: output/*.md
@@ -46,7 +46,7 @@ jobs:
           repository: kc-magic-pixel/kc-magic-pixel.github.io
           ssh-key: "${{ secrets.KCFGC_DEPLOY_KEY }}"
       - name: Download website files output
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: website-files
           path: content/events

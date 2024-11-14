@@ -33,7 +33,7 @@ jobs:
       - name: Extract
         run: node packages/start-gg/dist/index.js tournaments ${{ inputs.TOURNAMENT_IDS }} > output/start-gg-tournaments.json
       - name: Upload start.gg output
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: start-gg-tournaments.json
           path: output/start-gg-tournaments.json

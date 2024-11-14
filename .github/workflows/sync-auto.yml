@@ -49,7 +49,7 @@ jobs:
       TOURNAMENT_IDS: ${{ steps.output.outputs.TOURNAMENT_IDS }}
     steps:
       - name: Download start.gg output
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: start-gg-hubs.json
       - id: output

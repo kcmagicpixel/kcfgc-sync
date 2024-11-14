@@ -33,7 +33,7 @@ jobs:
       - name: Extract
         run: node packages/start-gg/dist/index.js hubs ${{ inputs.HUB_IDS }} > output/start-gg-hubs.json
       - name: Upload start.gg output
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: start-gg-hubs.json
           path: output/start-gg-hubs.json
