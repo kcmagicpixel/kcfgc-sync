@@ -1,9 +1,9 @@
 name: auto-sync
 run-name: Auto Sync
 on:
-  # Runs every day at 4:00am
+  # Runs every day at 4:00am CST
   schedule:
-    - cron: "0 4 * * *"
+    - cron: "0 12 * * *"
   workflow_dispatch:
   push:
     branches:
