@@ -11,7 +11,7 @@ jobs:
     name: Generate Website Files
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v2
         with:
           version: 8
@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-20.04
     needs: generate-website
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           repository: kc-magic-pixel/kc-magic-pixel.github.io
           ssh-key: "${{ secrets.KCFGC_DEPLOY_KEY }}"

@@ -16,7 +16,7 @@ jobs:
     outputs:
       TOURNAMENT_IDS: ${{ steps.output.outputs.TOURNAMENT_IDS }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - id: output
         name: Output id list
         run: echo "TOURNAMENT_IDS=$(cat auto-tournaments.txt | tr '\n' ' ')" >> "$GITHUB_OUTPUT"
@@ -27,7 +27,7 @@ jobs:
     outputs:
       HUB_IDS: ${{ steps.output.outputs.HUB_IDS }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - id: output
         name: Output id list
         run: echo "HUB_IDS=$(cat auto-hubs.txt | tr '\n' ' ')" >> "$GITHUB_OUTPUT"
