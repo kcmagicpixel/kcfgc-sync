@@ -87,8 +87,8 @@ ${yaml}
 ${tournament.description?.trim() ?? ""}
   `;
 
-  const filename = `${DateTime.fromISO(tournament.startDate).toISODate()}-${
-    tournament.slug
-  }.md`;
+  const filename = `${DateTime.fromISO(tournament.startDate, {
+    setZone: true,
+  }).toISODate()}-${tournament.slug}.md`;
   writeFileSync(resolve(outDir, filename), document);
 }

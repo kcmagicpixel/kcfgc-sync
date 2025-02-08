@@ -25,28 +25,6 @@ importers:
         specifier: ^20.0.0
         version: 20.17.6
 
-  packages/social:
-    dependencies:
-      '@emily-curry/fgc-sync-common':
-        specifier: workspace:*
-        version: link:../common
-      argparse:
-        specifier: ^2.0.1
-        version: 2.0.1
-      node-fetch:
-        specifier: ^3.3.1
-        version: 3.3.1
-      zod:
-        specifier: ^3.21.4
-        version: 3.21.4
-    devDependencies:
-      '@types/argparse':
-        specifier: ^2.0.10
-        version: 2.0.10
-      '@types/node':
-        specifier: ^20.0.0
-        version: 20.17.6
-
   packages/start-gg:
     dependencies:
       '@emily-curry/fgc-sync-common':

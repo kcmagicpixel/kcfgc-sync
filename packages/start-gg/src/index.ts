@@ -34,7 +34,7 @@ const args = parser.parse_args();
 
 const apiKey = args.apiKey;
 if (!apiKey) {
-  throw new Error("--apiKey is required");
+  throw new Error("--api-key is required");
 }
 
 if (Array.isArray(args.tournamentIds?.[0])) {
