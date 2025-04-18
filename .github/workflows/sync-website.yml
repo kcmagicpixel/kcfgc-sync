@@ -9,7 +9,7 @@ on:
 jobs:
   generate-website:
     name: Generate Website Files
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -36,7 +36,7 @@ jobs:
 
   upload-website:
     name: Upload Website Files
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     needs: generate-website
     steps:
       - uses: actions/checkout@v4
