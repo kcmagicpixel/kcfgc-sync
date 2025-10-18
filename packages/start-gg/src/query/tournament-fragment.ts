@@ -34,7 +34,10 @@ export const tournamentFragment = gql`
           id
           isFinal
           placement
-          standing
+          entrant {
+            id
+            name
+          }
           player {
             id
             gamerTag

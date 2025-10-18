@@ -41,11 +41,16 @@ export const GGPlayerSchema = z.object({
   prefix: z.string().optional(),
 });
 
+export const GGEntrantSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+});
+
 export const GGStandingSchema = z.object({
   id: z.number(),
-  standing: z.number(),
   placement: z.number(),
-  player: GGPlayerSchema,
+  player: GGPlayerSchema.optional(),
+  entrant: GGEntrantSchema.optional(),
 });
 
 export const GGBracketSchema = z.object({

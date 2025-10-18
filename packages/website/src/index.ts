@@ -47,12 +47,12 @@ for (const tournament of tournaments) {
       rules: ev.rules,
       url_bracket: ev.isPublished ? ev.brackets[0]?.url : undefined,
       standings: [...(ev.standings ?? [])]
-        .sort((a, b) => a.standing - b.standing)
+        .sort((a, b) => a.placement - b.placement)
         .map((st) => {
           return {
-            player: st.player.name,
-            prefix: st.player.prefix,
-            standing: st.standing,
+            player: st.player?.name ?? st.entrant?.name,
+            prefix: st.player?.prefix,
+            standing: st.placement,
           };
         })
         .slice(0, 3),

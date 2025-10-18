@@ -174,11 +174,14 @@ const loadTournament = withRetry(
               id: standing.id,
               standing: standing.standing,
               placement: standing.placement,
-              player: {
-                id: standing.player.id,
-                name: standing.player.gamerTag,
-                prefix: standing.player.prefix?.trim?.() || undefined,
-              },
+              player: !standing.player
+                ? undefined
+                : {
+                    id: standing.player.id,
+                    name: standing.player.gamerTag,
+                    prefix: standing.player.prefix?.trim?.() || undefined,
+                  },
+              entrant: standing.entrant ?? undefined,
             };
           }),
         };
