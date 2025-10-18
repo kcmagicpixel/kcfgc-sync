@@ -200,7 +200,7 @@ export const loadTournaments = async (
       const parsed = await loadTournament(tournamentId, apiKey);
       result.push(parsed);
     } catch (e) {
-      process.stderr.write((e as any)?.toString());
+      console.error(`[${tournamentId}]`, e);
       didError = true;
     }
   }

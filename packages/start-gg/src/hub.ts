@@ -38,7 +38,7 @@ export const loadHubs = async (apiKey: string, hubIds: string[]) => {
       const parsed = await loadHub(hubId);
       result.push(parsed);
     } catch (e) {
-      process.stderr.write((e as any)?.toString());
+      console.error(`[${hubId}]`, e);
       didError = true;
     }
   }
