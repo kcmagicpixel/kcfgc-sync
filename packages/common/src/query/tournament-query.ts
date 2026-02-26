@@ -1,5 +1,5 @@
 import { gql } from "graphql-request";
-import { tournamentFragment } from "./tournament-fragment";
+import { tournamentFragment } from "./tournament-fragment.js";
 
 export const tournamentQuery = gql`
   query TournamentQuery($slug: String) {

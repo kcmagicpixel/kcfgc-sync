@@ -1,33 +1,5 @@
-import { GGHubSchema } from "@emily-curry/fgc-sync-common";
-import { request } from "graphql-request";
+import { GGHubSchema, loadHub } from "@emily-curry/fgc-sync-common";
 import { z } from "zod";
-import { GQL_ENDPOINT_ALT, withRetry } from "./util";
-import { hubQuery } from "./query/hub-query";
-
-const loadHub = withRetry(async (hubId: string) => {
-  const { hub }: any = await request(
-    GQL_ENDPOINT_ALT,
-    hubQuery,
-    {
-      slug: `hub/${hubId}`,
-      perPage: 20,
-    },
-    { ["client-version"]: "20" }
-  );
-  const parsed = GGHubSchema.parse({
-    id: hub.id,
-    name: hub.name,
-    slug: hub.slug.replace(/^.*\//gi, ""),
-    tournaments: hub.tournaments?.nodes?.map((tournament: any) => {
-      return {
-        id: tournament.id,
-        name: tournament.name,
-        slug: tournament.slug.replace(/^.*\//gi, ""),
-      };
-    }),
-  });
-  return parsed;
-});
 
 export const loadHubs = async (apiKey: string, hubIds: string[]) => {
   let didError = false;

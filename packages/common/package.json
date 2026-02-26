@@ -7,14 +7,22 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "source": "src/index.ts",
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch"
   },
   "dependencies": {
+    "graphql": "^16.6.0",
+    "graphql-request": "^6.0.0",
+    "luxon": "^3.3.0",
+    "node-fetch": "^2.0.0",
     "zod": "^3.21.4"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0"
+    "@types/argparse": "^2.0.10",
+    "@types/luxon": "^3.3.0",
+    "@types/node": "^24.0.0",
+    "@types/node-fetch": "^2.6.13"
   }
 }

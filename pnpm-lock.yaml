@@ -30,9 +30,31 @@ importers:
       '@emily-curry/fgc-sync-common':
         specifier: workspace:*
         version: link:../common
+      '@emily-curry/fgc-sync-start-gg-lib':
+        specifier: workspace:*
+        version: link:../start-gg-lib
       argparse:
         specifier: ^2.0.1
         version: 2.0.1
+      zod:
+        specifier: ^3.21.4
+        version: 3.21.4
+    devDependencies:
+      '@types/argparse':
+        specifier: ^2.0.10
+        version: 2.0.10
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.17.6
+      dotenv:
+        specifier: ^16.0.3
+        version: 16.0.3
+
+  packages/start-gg-lib:
+    dependencies:
+      '@emily-curry/fgc-sync-common':
+        specifier: workspace:*
+        version: link:../common
       graphql:
         specifier: ^16.6.0
         version: 16.6.0
@@ -44,7 +66,7 @@ importers:
         version: 3.3.0
       node-fetch:
         specifier: ^2.0.0
-        version: 2.0.0
+        version: 2.7.0
       zod:
         specifier: ^3.21.4
         version: 3.21.4
@@ -61,9 +83,6 @@ importers:
       '@types/node-fetch':
         specifier: ^2.6.4
         version: 2.6.4
-      dotenv:
-        specifier: ^16.0.3
-        version: 16.0.3
 
   packages/website:
     dependencies:
@@ -176,10 +195,6 @@ packages:
   node-domexception@1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
     engines: {node: '>=10.5.0'}
-
-  node-fetch@2.0.0:
-    resolution: {integrity: sha512-bici2HCWFnAghTYMcy12WPxrEwJ5qK7GQJOTwTfyEZjyL99ECWxbYQfabZ2U1zrHMKkOBE97Z9iHIuKQfCMdzQ==}
-    engines: {node: 4.x || >=6.0.0}
 
   node-fetch@2.7.0:
     resolution: {integrity: sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==}
@@ -300,8 +315,6 @@ snapshots:
       mime-db: 1.52.0
 
   node-domexception@1.0.0: {}
-
-  node-fetch@2.0.0: {}
 
   node-fetch@2.7.0:
     dependencies:
