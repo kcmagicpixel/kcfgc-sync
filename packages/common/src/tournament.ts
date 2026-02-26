@@ -127,13 +127,14 @@ export const loadTournament = withRetry(
             .toISO(),
           competitionTier: event.competitionTier,
           registrationFee:
-            registrationOptionValue?.fee > 0
-              ? registrationOptionValue.fee
-              : undefined,
+            registrationOptionValue?.fee > 0 ?
+              registrationOptionValue.fee
+            : undefined,
           rules: event.rulesMarkdown?.trim?.() || undefined,
           isPublished: event.publishing?.publish || false,
-          prizing: event.prizingInfo.enablePrizing
-            ? {
+          prizing:
+            event.prizingInfo.enablePrizing ?
+              {
                 payoutType: event.prizingInfo.payoutType,
                 description: event.prizingInfo.markdown?.trim?.() || undefined,
                 payouts: event.prizingInfo.prizing.map((prize: any) => {
@@ -142,11 +143,11 @@ export const loadTournament = withRetry(
                     id: prize.id,
                     placement: prize.placement,
                     amount:
-                      event.prizingInfo.payoutType === "percentage"
-                        ? prize.percent
-                        : event.prizingInfo.payoutType === "fixedAmount"
-                        ? prize.amount
-                        : undefined,
+                      event.prizingInfo.payoutType === "percentage" ?
+                        prize.percent
+                      : event.prizingInfo.payoutType === "fixedAmount" ?
+                        prize.amount
+                      : undefined,
                   };
                 }),
               }
@@ -173,13 +174,14 @@ export const loadTournament = withRetry(
               id: standing.id,
               standing: standing.standing,
               placement: standing.placement,
-              player: !standing.player
-                ? undefined
-                : {
+              player:
+                !standing.player ? undefined : (
+                  {
                     id: standing.player.id,
                     name: standing.player.gamerTag,
                     prefix: standing.player.prefix?.trim?.() || undefined,
-                  },
+                  }
+                ),
               entrant: standing.entrant ?? undefined,
             };
           }),

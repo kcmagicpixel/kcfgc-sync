@@ -10,7 +10,8 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "watch": "tsc --watch"
+    "watch": "tsc --watch",
+    "format": "prettier --write src"
   },
   "dependencies": {
     "graphql": "^16.6.0",

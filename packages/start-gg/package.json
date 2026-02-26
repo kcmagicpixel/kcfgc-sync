@@ -10,6 +10,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
+    "format": "prettier --write src",
     "exec:t": "node -r dotenv/config dist/index.js tournaments magic-pixel-weekly-120 > ./out/tournaments.json",
     "exec:h": "node -r dotenv/config dist/index.js hubs magic-pixel > ./out/hubs.json"
   },

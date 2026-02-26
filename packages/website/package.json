@@ -9,6 +9,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
+    "format": "prettier --write src",
     "exec": "node dist/index.js --out-dir=./out/ < ../start-gg/out/tournaments.json"
   },
   "dependencies": {
