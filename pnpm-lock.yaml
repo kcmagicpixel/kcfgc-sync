@@ -22,8 +22,8 @@ importers:
         version: 3.21.4
     devDependencies:
       '@types/node':
-        specifier: ^20.0.0
-        version: 20.17.6
+        specifier: ^24.0.0
+        version: 24.10.15
 
   packages/start-gg:
     dependencies:
@@ -44,8 +44,8 @@ importers:
         specifier: ^2.0.10
         version: 2.0.10
       '@types/node':
-        specifier: ^20.0.0
-        version: 20.17.6
+        specifier: ^24.0.0
+        version: 24.10.15
       dotenv:
         specifier: ^16.0.3
         version: 16.0.3
@@ -78,8 +78,8 @@ importers:
         specifier: ^3.3.0
         version: 3.3.0
       '@types/node':
-        specifier: ^20.0.0
-        version: 20.17.6
+        specifier: ^24.0.0
+        version: 24.10.15
       '@types/node-fetch':
         specifier: ^2.6.4
         version: 2.6.4
@@ -112,8 +112,8 @@ importers:
         specifier: ^3.3.0
         version: 3.3.0
       '@types/node':
-        specifier: ^20.0.0
-        version: 20.17.6
+        specifier: ^24.0.0
+        version: 24.10.15
 
 packages:
 
@@ -131,8 +131,8 @@ packages:
   '@types/node-fetch@2.6.4':
     resolution: {integrity: sha512-1ZX9fcN4Rvkvgv4E6PAY5WXUFWFcRWxZa3EW83UjycOB9ljJCedb2CupIP4RZMEwF/M3eTcCihbBRgwtGbg5Rg==}
 
-  '@types/node@20.17.6':
-    resolution: {integrity: sha512-VEI7OdvK2wP7XHnsuXbAJnEpEkF6NjSN45QJlL4VGqZSXsnicpesdTWsg9RISeSdYd3yeRj/y3k5KGjUXYnFwQ==}
+  '@types/node@24.10.15':
+    resolution: {integrity: sha512-BgjLoRuSr0MTI5wA6gMw9Xy0sFudAaUuvrnjgGx9wZ522fYYLA5SYJ+1Y30vTcJEG+DRCyDHx/gzQVfofYzSdg==}
 
   argparse@2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
@@ -222,8 +222,8 @@ packages:
     engines: {node: '>=12.20'}
     hasBin: true
 
-  undici-types@6.19.8:
-    resolution: {integrity: sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==}
+  undici-types@7.16.0:
+    resolution: {integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==}
 
   web-streams-polyfill@3.2.1:
     resolution: {integrity: sha512-e0MO3wdXWKrLbL0DgGnUV7WHVuw9OUvL4hjgnPkIeEvESk74gAITi5G606JtZPp39cd8HA9VQzCIvA49LpPN5Q==}
@@ -254,12 +254,12 @@ snapshots:
 
   '@types/node-fetch@2.6.4':
     dependencies:
-      '@types/node': 20.17.6
+      '@types/node': 24.10.15
       form-data: 3.0.1
 
-  '@types/node@20.17.6':
+  '@types/node@24.10.15':
     dependencies:
-      undici-types: 6.19.8
+      undici-types: 7.16.0
 
   argparse@2.0.1: {}
 
@@ -332,7 +332,7 @@ snapshots:
 
   typescript@5.0.4: {}
 
-  undici-types@6.19.8: {}
+  undici-types@7.16.0: {}
 
   web-streams-polyfill@3.2.1: {}
 
