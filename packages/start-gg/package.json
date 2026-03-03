@@ -12,7 +12,9 @@
     "watch": "tsc --watch",
     "format": "prettier --write src",
     "exec:t": "node -r dotenv/config dist/index.js tournaments magic-pixel-weekly-120 > ./out/tournaments.json",
-    "exec:h": "node -r dotenv/config dist/index.js hubs magic-pixel > ./out/hubs.json"
+    "exec:h": "node -r dotenv/config dist/index.js hubs magic-pixel > ./out/hubs.json",
+    "clean": "rm -rf dist",
+    "purge": "rm -rf node_modules"
   },
   "dependencies": {
     "@emily-curry/fgc-sync-common": "workspace:*",
