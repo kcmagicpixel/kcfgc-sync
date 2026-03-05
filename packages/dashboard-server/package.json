@@ -1,0 +1,35 @@
+{
+  "name": "@emily-curry/fgc-sync-dashboard-server",
+  "version": "0.0.0",
+  "private": true,
+  "author": "Emily Curry <emily@curry.sh>",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/app.js",
+  "types": "dist/app.d.ts",
+  "source": "src/app.ts",
+  "scripts": {
+    "watch": "tsx watch --exclude=\"../dashboard-web/**/*\" --clear-screen=false -r dotenv/config ./src/app.ts",
+    "build": "tsc",
+    "format": "prettier --write src",
+    "clean": "rm -rf dist",
+    "purge": "rm -rf node_modules"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.17.0",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.2.1",
+    "express-session": "^1.19.0",
+    "pino": "^10.3.1",
+    "pino-pretty": "^13.1.3",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/express-session": "^1.18.2",
+    "@types/node": "^24.10.1",
+    "dotenv": "^16.0.3",
+    "tsx": "^4.21.0",
+    "vite": "^7.3.1"
+  }
+}
