@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { getDb, setupTestDb } from "../setup.js";
-import { Container } from "../../src/modules/container.js";
-import { SessionRepository } from "../../src/modules/session/session.repository.js";
-import { SessionService } from "../../src/modules/session/session.service.js";
+import { Container } from "#modules/container.js";
+import { SessionRepository } from "#modules/session/session.repository.js";
+import { SessionService } from "#modules/session/session.service.js";
 
 setupTestDb();
 

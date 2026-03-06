@@ -1,7 +1,7 @@
+import { Log } from "#log";
+import type { Ctor } from "#utils/ctor.type.js";
+import { nn } from "#utils/nn.util.js";
 import type { Client } from "@libsql/client";
-import type { Ctor } from "../utils/ctor.type.js";
-import { nn } from "../utils/nn.util.js";
-import { Log } from "../log.js";
 
 type Singleton = {
   db: Client;

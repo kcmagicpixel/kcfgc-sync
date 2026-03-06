@@ -8,6 +8,11 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "source": "src/index.ts",
+  "imports": {
+    "#config": "./dist/config.js",
+    "#log": "./dist/log.js",
+    "#utils/*": "./dist/utils/*"
+  },
   "scripts": {
     "watch": "tsx watch --exclude=\"../dashboard-web/**/*\" --clear-screen=false -r dotenv/config ./src/index.ts",
     "build": "tsc -p tsconfig.app.json",
@@ -32,6 +37,7 @@
     "dotenv": "^16.0.3",
     "tsx": "^4.21.0",
     "vite": "^7.3.1",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "vite-tsconfig-paths": "^6.1.1"
   }
 }

@@ -1,8 +1,8 @@
+import { Log } from "#log";
 import type { Client } from "@libsql/client";
 import { readdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { Log } from "../log.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

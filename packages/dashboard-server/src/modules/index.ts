@@ -1,13 +1,13 @@
+import type { Ctor } from "#utils/ctor.type.js";
 import type { Client } from "@libsql/client";
 import type { Application } from "express";
-import { Container } from "./container.js";
-import { JobController } from "./job/job.controller.js";
-import { DashboardController } from "./express/dashboard.controller.js";
-import type { Controller } from "./base.controller.js";
-import type { Ctor } from "../utils/ctor.type.js";
-import { SessionController } from "./session/session.controller.js";
-import { RateLimitController } from "./express/rate-limit.controller.js";
 import { AuthController } from "./auth/auth.controller.js";
+import type { Controller } from "./base.controller.js";
+import { Container } from "./container.js";
+import { DashboardController } from "./express/dashboard.controller.js";
+import { RateLimitController } from "./express/rate-limit.controller.js";
+import { JobController } from "./job/job.controller.js";
+import { SessionController } from "./session/session.controller.js";
 
 /**
  * List of all controllers to register. Order may matter in some cases.
