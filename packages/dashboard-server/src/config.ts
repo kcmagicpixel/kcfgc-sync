@@ -10,6 +10,7 @@ const ConfigSchema = z.object({
   }),
   server: z.object({
     port: z.number().nonnegative(),
+    rateLimitPoints: z.int(),
     sessionSecret: z.string(),
     secure: z.boolean(),
   }),
@@ -33,6 +34,7 @@ const ConfigFromEnv = z.preprocess((env: Record<any, any>) => {
     },
     server: {
       port: Number(env.DASHBOARD_PORT),
+      rateLimitPoints: Number(env.DASHBOARD_LIMIT_POINT),
       sessionSecret: env.DASHBOARD_SESSION_SECRET,
       secure: env.DASHBOARD_SECURE === "true",
     },

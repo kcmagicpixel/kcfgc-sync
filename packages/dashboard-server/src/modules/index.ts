@@ -6,6 +6,7 @@ import { DashboardController } from "./dashboard/dashboard.controller.js";
 import type { Controller } from "./base.controller.js";
 import type { Ctor } from "../utils/ctor.type.js";
 import { SessionController } from "./session/session.controller.js";
+import { RateLimitController } from "./rate-limit/rate-limit.controller.js";
 import { AuthController } from "./auth/auth.controller.js";
 
 /**
@@ -14,6 +15,7 @@ import { AuthController } from "./auth/auth.controller.js";
  */
 const orderedControllers: Array<Ctor<Controller>> = [
   SessionController,
+  RateLimitController,
   AuthController,
   JobController,
   DashboardController, // Always last, contains fallback routes

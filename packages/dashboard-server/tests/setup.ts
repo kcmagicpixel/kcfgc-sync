@@ -3,11 +3,10 @@ import { createClient, type Client } from "@libsql/client";
 import type { Server } from "node:http";
 import { initExpress } from "../src/app.js";
 import { Container } from "../src/modules/container.js";
-import { SessionController } from "../src/modules/session/session.controller.js";
-import { AuthController } from "../src/modules/auth/auth.controller.js";
 import { up as userMigration } from "../src/data/migrations/0001.user.migration.js";
 import { up as sessionMigration } from "../src/data/migrations/0002.session.migration.js";
 import { Config } from "../src/config.js";
+import { initModules } from "../src/modules/index.js";
 
 let server: Server;
 let baseUrl: string;
@@ -44,10 +43,7 @@ export function setupTestServer() {
 
   beforeAll(async () => {
     const app = await initExpress();
-    const sessionCtrl = Container.getInstance(SessionController);
-    const authCtrl = Container.getInstance(AuthController);
-    await sessionCtrl.register(app);
-    await authCtrl.register(app);
+    initModules(getDb(), app);
 
     await new Promise<void>((resolve) => {
       server = app.listen(Config.server.port, () => {
