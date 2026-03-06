@@ -22,7 +22,11 @@ export class MigrationsExecutor {
     await this.db.execute(this.TABLE_CREATE);
 
     const files = await readdir(path.join(__dirname, "migrations"));
-    for (const filename of files) {
+    for (const filenameRaw of files) {
+      if (filenameRaw.endsWith(".map")) {
+        continue;
+      }
+      const filename = filenameRaw.replace(/\.[tj]s$/i, "");
       const migrationRows = await this.db.execute(
         `SELECT * FROM migrations where name = ?`,
         [filename]
