@@ -6,6 +6,7 @@ import { DashboardController } from "./dashboard/dashboard.controller.js";
 import type { Controller } from "./base.controller.js";
 import type { Ctor } from "../utils/ctor.type.js";
 import { SessionController } from "./session/session.controller.js";
+import { AuthController } from "./auth/auth.controller.js";
 
 /**
  * List of all controllers to register. Order may matter in some cases.
@@ -13,6 +14,7 @@ import { SessionController } from "./session/session.controller.js";
  */
 const orderedControllers: Array<Ctor<Controller>> = [
   SessionController,
+  AuthController,
   JobController,
   DashboardController, // Always last, contains fallback routes
 ];

@@ -11,9 +11,11 @@ const ConfigSchema = z.object({
   server: z.object({
     port: z.number().positive(),
     sessionSecret: z.string(),
+    secure: z.boolean(),
   }),
   seed: z.object({
-    // user/pass
+    user: z.string().min(1),
+    pass: z.string().min(1),
   }),
   startgg: z.object({
     apiKey: z.string(),
@@ -32,8 +34,12 @@ const ConfigFromEnv = z.preprocess((env: Record<any, any>) => {
     server: {
       port: Number(env.DASHBOARD_PORT),
       sessionSecret: env.DASHBOARD_SESSION_SECRET,
+      secure: env.DASHBOARD_SECURE === "true",
     },
-    seed: {},
+    seed: {
+      user: env.SEED_USER,
+      pass: env.SEED_PASS,
+    },
     startgg: {
       apiKey: env.START_GG_API_KEY,
     },

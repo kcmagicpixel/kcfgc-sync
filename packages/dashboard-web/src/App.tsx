@@ -1,10 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
 
 function App() {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    fetch("/api/auth/me").then((res) => {
+      if (!res.ok) navigate("/login");
+      else setLoading(false);
+    });
+  }, [navigate]);
+
+  if (loading) return null;
 
   return (
     <>
