@@ -10,10 +10,11 @@
   "source": "src/index.ts",
   "scripts": {
     "watch": "tsx watch --exclude=\"../dashboard-web/**/*\" --clear-screen=false -r dotenv/config ./src/index.ts",
-    "build": "tsc",
-    "format": "prettier --write src",
+    "build": "tsc -p tsconfig.app.json",
+    "format": "prettier --write src tests",
     "clean": "rm -rf dist",
-    "purge": "rm -rf node_modules"
+    "purge": "rm -rf node_modules",
+    "test": "vitest"
   },
   "dependencies": {
     "@libsql/client": "^0.17.0",
@@ -30,6 +31,7 @@
     "@types/node": "^24.10.1",
     "dotenv": "^16.0.3",
     "tsx": "^4.21.0",
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "vitest": "^4.0.18"
   }
 }

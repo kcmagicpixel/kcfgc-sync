@@ -2,14 +2,14 @@ import { z } from "zod";
 
 const ConfigSchema = z.object({
   database: z.object({
-    path: z.string().startsWith("file:"),
+    path: z.union([z.string().startsWith("file:"), z.literal(":memory:")]),
   }),
   log: z.object({
     format: z.enum(["pretty", "json"]),
     level: z.string(),
   }),
   server: z.object({
-    port: z.number().positive(),
+    port: z.number().nonnegative(),
     sessionSecret: z.string(),
     secure: z.boolean(),
   }),

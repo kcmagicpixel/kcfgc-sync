@@ -1,12 +1,7 @@
 {
-  "extends": "../../tsconfig.base",
-  "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "src",
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
-    "lib": ["ESNext"],
-    "declaration": false,
-    "declarationMap": false
-  }
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.test.json" }
+  ]
 }
