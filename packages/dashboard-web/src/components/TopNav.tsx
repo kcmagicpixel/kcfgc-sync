@@ -21,6 +21,12 @@ export function TopNav() {
           >
             Jobs
           </Link>
+          <Link
+            to="/tournaments"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground"
+          >
+            Tournaments
+          </Link>
         </div>
         <Button
           onPress={handleLogout}
