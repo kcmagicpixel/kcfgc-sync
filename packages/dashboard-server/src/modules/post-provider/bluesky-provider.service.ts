@@ -1,8 +1,9 @@
-import { AtpAgent } from "@atproto/api";
+import { AtpAgent, RichText } from "@atproto/api";
 import { Config } from "#config";
 import { Container } from "#container";
 import { Log } from "#log";
 import type { PostProvider, PostEmbed } from "./post-provider.model.js";
+import { stripMarkdownForBluesky } from "#utils/markdown.util.js";
 
 export class BlueskyPostProvider implements PostProvider {
   readonly name = "bluesky";
@@ -22,12 +23,24 @@ export class BlueskyPostProvider implements PostProvider {
     return agent;
   }
 
-  async post(text: string, images: Buffer[], postEmbed?: PostEmbed): Promise<{ url: string }> {
+  async post(
+    text: string,
+    images: Buffer[],
+    postEmbed?: PostEmbed
+  ): Promise<{ url: string }> {
     const agent = await this.getAgent();
 
     let embed:
       | { $type: string; images: { alt: string; image: unknown }[] }
-      | { $type: string; external: { uri: string; title: string; description: string; thumb?: unknown } }
+      | {
+          $type: string;
+          external: {
+            uri: string;
+            title: string;
+            description: string;
+            thumb?: unknown;
+          };
+        }
       | undefined;
 
     if (postEmbed) {
@@ -62,8 +75,28 @@ export class BlueskyPostProvider implements PostProvider {
       };
     }
 
+    // Parse markdown and build rich text with facets
+    const { text: plainText, linkFacets } = stripMarkdownForBluesky(text);
+    const rt = new RichText({ text: plainText });
+    await rt.detectFacets(agent);
+
+    // Add link facets from markdown [text](url) syntax
+    if (linkFacets.length > 0) {
+      if (!rt.facets) rt.facets = [];
+      for (const lf of linkFacets) {
+        rt.facets.push({
+          index: {
+            byteStart: rt.unicodeText.utf16IndexToUtf8Index(lf.start),
+            byteEnd: rt.unicodeText.utf16IndexToUtf8Index(lf.end),
+          },
+          features: [{ $type: "app.bsky.richtext.facet#link", uri: lf.url }],
+        });
+      }
+    }
+
     const res = await agent.post({
-      text,
+      text: rt.text,
+      facets: rt.facets,
       embed: embed as any,
     });
 

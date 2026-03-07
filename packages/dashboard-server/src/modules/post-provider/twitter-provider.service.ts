@@ -3,6 +3,7 @@ import { Config } from "#config";
 import { Container } from "#container";
 import { Log } from "#log";
 import type { PostProvider, PostEmbed } from "./post-provider.model.js";
+import { stripMarkdown } from "#utils/markdown.util.js";
 
 export class TwitterPostProvider implements PostProvider {
   readonly name = "twitter";
@@ -19,11 +20,15 @@ export class TwitterPostProvider implements PostProvider {
     });
   }
 
-  async post(text: string, images: Buffer[], embed?: PostEmbed): Promise<{ url: string }> {
+  async post(
+    text: string,
+    images: Buffer[],
+    embed?: PostEmbed
+  ): Promise<{ url: string }> {
     const client = this.getClient();
 
     let mediaIds: string[] | undefined;
-    let tweetText = text;
+    let tweetText = stripMarkdown(text);
 
     if (embed) {
       // Upload embed thumbnail if present
@@ -34,7 +39,7 @@ export class TwitterPostProvider implements PostProvider {
         mediaIds = [mediaId];
       }
       // Append embed URL to post body
-      tweetText = `${text}\n\n${embed.url}`;
+      tweetText = `${tweetText}\n\n${embed.url}`;
     } else if (images.length > 0) {
       mediaIds = await Promise.all(
         images.map((data) =>
