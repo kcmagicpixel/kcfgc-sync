@@ -102,6 +102,12 @@ export default function Posts() {
             Images
           </Link>
           <Link
+            to="/posts/replacements"
+            className="border border-foreground bg-background px-3 py-1.5 text-sm font-medium text-foreground shadow-xs hover:bg-accent"
+          >
+            Replacements
+          </Link>
+          <Link
             to="/posts/new"
             className="border border-foreground bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground shadow-xs hover:bg-primary/90 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none"
           >

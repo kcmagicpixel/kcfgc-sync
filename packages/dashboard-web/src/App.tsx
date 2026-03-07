@@ -5,6 +5,7 @@ import Tournaments from "./pages/Tournaments.tsx";
 import Posts from "./pages/Posts.tsx";
 import PostCreate from "./pages/PostCreate.tsx";
 import Images from "./pages/Images.tsx";
+import Replacements from "./pages/Replacements.tsx";
 import { TopNav } from "./components/TopNav.tsx";
 
 export default function App() {
@@ -20,6 +21,7 @@ export default function App() {
           <Route path="posts" element={<Posts />} />
           <Route path="posts/new" element={<PostCreate />} />
           <Route path="posts/images" element={<Images />} />
+          <Route path="posts/replacements" element={<Replacements />} />
           <Route path="*" element={<Navigate to="/jobs" replace />} />
         </Routes>
       </main>

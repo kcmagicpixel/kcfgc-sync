@@ -5,6 +5,7 @@ import { JobRepository } from "#modules/job/job.repository.js";
 import { PostRepository } from "#modules/post/post.repository.js";
 import { ImageRepository } from "#modules/post/image.repository.js";
 import { PostWorker } from "#modules/post/post.worker.js";
+import { ReplacementRepository } from "#modules/replacement/replacement.repository.js";
 import type { PostProvider } from "#modules/post-provider/post-provider.model.js";
 
 setupTestDb();
@@ -74,6 +75,7 @@ describe("Post", () => {
       await getDb().execute("DELETE FROM job WHERE type = 'post'");
       await getDb().execute("DELETE FROM post");
       await getDb().execute("DELETE FROM image");
+      await getDb().execute("DELETE FROM replacement");
     });
 
     function createMockProvider(name: string, url: string): PostProvider {
@@ -91,9 +93,11 @@ describe("Post", () => {
       const bluesky = createMockProvider("bluesky", "https://bsky.app/test");
       const twitter = createMockProvider("twitter", "https://x.com/test");
 
+      const replacementRepo = Container.getInstance(ReplacementRepository);
       const worker = new PostWorker(
         postRepo,
         imageRepo,
+        replacementRepo,
         bluesky as any,
         twitter as any,
       );
@@ -122,9 +126,11 @@ describe("Post", () => {
 
       const imgId = await imageRepo.insert(Buffer.from("test-image"), "image/png");
 
+      const replacementRepo = Container.getInstance(ReplacementRepository);
       const worker = new PostWorker(
         postRepo,
         imageRepo,
+        replacementRepo,
         bluesky as any,
         twitter as any,
       );
@@ -149,9 +155,11 @@ describe("Post", () => {
       const bluesky = createMockProvider("bluesky", "https://bsky.app/embed");
       const twitter = createMockProvider("twitter", "https://x.com/embed");
 
+      const replacementRepo = Container.getInstance(ReplacementRepository);
       const worker = new PostWorker(
         postRepo,
         imageRepo,
+        replacementRepo,
         bluesky as any,
         twitter as any,
       );
@@ -178,9 +186,11 @@ describe("Post", () => {
 
       const imgId = await imageRepo.insert(Buffer.from("thumb-data"), "image/png");
 
+      const replacementRepo = Container.getInstance(ReplacementRepository);
       const worker = new PostWorker(
         postRepo,
         imageRepo,
+        replacementRepo,
         bluesky as any,
         twitter as any,
       );
@@ -209,9 +219,11 @@ describe("Post", () => {
       const bluesky = createMockProvider("bluesky", "");
       const twitter = createMockProvider("twitter", "");
 
+      const replacementRepo = Container.getInstance(ReplacementRepository);
       const worker = new PostWorker(
         postRepo,
         imageRepo,
+        replacementRepo,
         bluesky as any,
         twitter as any,
       );
@@ -233,9 +245,11 @@ describe("Post", () => {
       const bluesky = createMockProvider("bluesky", "");
       const twitter = createMockProvider("twitter", "");
 
+      const replacementRepo = Container.getInstance(ReplacementRepository);
       const worker = new PostWorker(
         postRepo,
         imageRepo,
+        replacementRepo,
         bluesky as any,
         twitter as any,
       );

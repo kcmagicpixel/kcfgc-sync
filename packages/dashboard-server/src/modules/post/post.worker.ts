@@ -7,6 +7,7 @@ import { ImageRepository } from "./image.repository.js";
 import { BlueskyPostProvider } from "../post-provider/bluesky-provider.service.js";
 import { TwitterPostProvider } from "../post-provider/twitter-provider.service.js";
 import type { PostProvider, PostEmbed } from "../post-provider/post-provider.model.js";
+import { ReplacementRepository } from "../replacement/replacement.repository.js";
 
 const EmbedPayload = z.object({
   url: z.string(),
@@ -34,6 +35,7 @@ export class PostWorker implements Worker {
   constructor(
     private readonly postRepo: PostRepository,
     private readonly imageRepo: ImageRepository,
+    private readonly replacementRepo: ReplacementRepository,
     bluesky: BlueskyPostProvider,
     twitter: TwitterPostProvider,
   ) {
@@ -80,7 +82,16 @@ export class PostWorker implements Worker {
       imageIds.length > 0 ? await this.imageRepo.findByIds(imageIds) : [];
     const imageBuffers = images.map((img) => Buffer.from(img.data));
 
-    const result = await provider.post(text, imageBuffers, embed);
+    // Apply text replacements for this provider
+    const replacements = await this.replacementRepo.findAll();
+    let processedText = text;
+    for (const r of replacements) {
+      if (r.output[providerName] != null) {
+        processedText = processedText.replaceAll(r.input, r.output[providerName]);
+      }
+    }
+
+    const result = await provider.post(processedText, imageBuffers, embed);
     this.log.info(`Posted via ${providerName}: ${result.url}`);
 
     await this.postRepo.insert(uniqueKey, providerName, result.url);
@@ -92,6 +103,7 @@ export class PostWorker implements Worker {
 Container.register(PostWorker, [
   PostRepository,
   ImageRepository,
+  ReplacementRepository,
   BlueskyPostProvider,
   TwitterPostProvider,
 ]);
