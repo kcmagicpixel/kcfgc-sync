@@ -2,8 +2,8 @@ import type { Ctor } from "#utils/ctor.type.js";
 import type { Client } from "@libsql/client";
 import type { Application } from "express";
 import { AuthController } from "./auth/auth.controller.js";
-import type { Controller } from "./base.controller.js";
-import { Container } from "./container.js";
+import type { Controller } from "./controller.model.js";
+import { Container } from "#container";
 import { DashboardController } from "./express/dashboard.controller.js";
 import { RateLimitController } from "./express/rate-limit.controller.js";
 import { JobController } from "./job/job.controller.js";
@@ -21,9 +21,7 @@ const orderedControllers: Array<Ctor<Controller>> = [
   DashboardController, // Always last, contains fallback routes
 ];
 
-export function initModules(db: Client, app: Application) {
-  Container.registerSingleton("db", db);
-
+export function initControllers(app: Application) {
   for (const ctrl of orderedControllers) {
     const inst = Container.getInstance(ctrl);
     inst.register(app);

@@ -10,6 +10,7 @@
   "source": "src/index.ts",
   "imports": {
     "#config": "./dist/config.js",
+    "#container": "./dist/container.js",
     "#log": "./dist/log.js",
     "#utils/*": "./dist/utils/*"
   },
