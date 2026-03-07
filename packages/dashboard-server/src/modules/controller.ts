@@ -9,6 +9,7 @@ import { RateLimitController } from "./express/rate-limit.controller.js";
 import { JobController } from "./job/job.controller.js";
 import { SessionController } from "./session/session.controller.js";
 import { TournamentController } from "./tournament/tournament.controller.js";
+import { PostController } from "./post/post.controller.js";
 
 /**
  * List of all controllers to register. Order may matter in some cases.
@@ -20,6 +21,7 @@ const orderedControllers: Array<Ctor<Controller>> = [
   AuthController,
   JobController,
   TournamentController,
+  PostController,
   DashboardController, // Always last, contains fallback routes
 ];
 

@@ -29,6 +29,13 @@ export const JOB_TYPES: Record<string, JobTypeConfig> = {
       },
     ],
   },
+  post: {
+    label: "Post",
+    fields: [
+      { name: "provider", label: "Provider", type: "text", required: true },
+      { name: "text", label: "Text", type: "text", required: true },
+    ],
+  },
 };
 
 export const JOB_TYPE_KEYS = Object.keys(JOB_TYPES);

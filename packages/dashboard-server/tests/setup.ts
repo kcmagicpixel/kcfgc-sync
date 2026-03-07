@@ -10,8 +10,11 @@ import { up as tournamentMigration } from "../src/data/migrations/0004.tournamen
 import { up as jobScheduleMigration } from "../src/data/migrations/0005.job-schedule.migration.js";
 import { up as tournamentUpdatedAtMigration } from "../src/data/migrations/0006.tournament-updated-at.migration.js";
 import { up as jobUniqueKeyMigration } from "../src/data/migrations/0007.job-unique-key.migration.js";
+import { up as postMigration } from "../src/data/migrations/0008.post.migration.js";
+import { up as imageMigration } from "../src/data/migrations/0009.image.migration.js";
 import { Config } from "../src/config.js";
 import { initControllers } from "../src/modules/controller.js";
+import { MigrationsExecutor } from "../src/data/migrations.util.js";
 
 let server: Server;
 let baseUrl: string;
@@ -32,13 +35,8 @@ export function extractCookie(res: Response): string | undefined {
 export function setupTestDb() {
   beforeAll(async () => {
     db = createClient({ url: Config.database.path });
-    await userMigration(db);
-    await sessionMigration(db);
-    await jobMigration(db);
-    await tournamentMigration(db);
-    await jobScheduleMigration(db);
-    await tournamentUpdatedAtMigration(db);
-    await jobUniqueKeyMigration(db);
+    const migrations = new MigrationsExecutor(db);
+    await migrations.execute();
 
     Container.registerSingleton("db", db);
   });

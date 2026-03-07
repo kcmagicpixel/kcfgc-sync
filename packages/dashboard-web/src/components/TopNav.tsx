@@ -22,6 +22,12 @@ export function TopNav() {
             Jobs
           </Link>
           <Link
+            to="/posts"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground"
+          >
+            Posts
+          </Link>
+          <Link
             to="/tournaments"
             className="text-sm font-medium text-muted-foreground hover:text-foreground"
           >

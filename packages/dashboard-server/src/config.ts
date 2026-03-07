@@ -25,6 +25,16 @@ const ConfigSchema = z.object({
   startgg: z.object({
     apiKey: z.string(),
   }),
+  bluesky: z.object({
+    identifier: z.string(),
+    password: z.string(),
+  }),
+  twitter: z.object({
+    appKey: z.string(),
+    appSecret: z.string(),
+    accessToken: z.string(),
+    accessSecret: z.string(),
+  }),
 });
 
 const ConfigFromEnv = z.preprocess((env: Record<any, any>) => {
@@ -52,6 +62,16 @@ const ConfigFromEnv = z.preprocess((env: Record<any, any>) => {
     },
     startgg: {
       apiKey: env.START_GG_API_KEY,
+    },
+    bluesky: {
+      identifier: env.BSKY_USERNAME,
+      password: env.BSKY_APP_PASSWORD,
+    },
+    twitter: {
+      appKey: env.TWITTER_APP_KEY,
+      appSecret: env.TWITTER_APP_SECRET,
+      accessToken: env.TWITTER_ACCESS_TOKEN,
+      accessSecret: env.TWITTER_ACCESS_SECRET,
     },
   } satisfies Config;
 }, ConfigSchema);

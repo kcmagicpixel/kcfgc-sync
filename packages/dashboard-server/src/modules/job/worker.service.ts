@@ -21,7 +21,9 @@ export class WorkerService {
 
   start(): void {
     const { pollIntervalMs } = Config.worker;
-    this.log.info(`Starting worker engine, poll interval: ${pollIntervalMs}ms`);
+    this.log.trace(
+      `Starting worker engine, poll interval: ${pollIntervalMs}ms`
+    );
     this.intervalId = setInterval(() => this.tick(), pollIntervalMs);
   }
 
@@ -36,7 +38,7 @@ export class WorkerService {
         this.stopping = resolve;
       });
     }
-    this.log.info("Worker engine stopped");
+    this.log.trace("Worker engine stopped");
     return Promise.resolve();
   }
 
@@ -83,7 +85,7 @@ export class WorkerService {
           job.payload,
           nextRun.getTime(),
           job.schedule,
-          job.uniqueKey,
+          job.uniqueKey
         );
         this.log.info(
           `Scheduled next ${job.type} job for ${nextRun.toISOString()}`

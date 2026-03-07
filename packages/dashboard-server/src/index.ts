@@ -23,5 +23,5 @@ process.on("SIGTERM", async () => {
   process.exit(0);
 });
 
-Log.info(`app starting at http://localhost:${Config.server.port}`);
+Log.info(`App starting at http://localhost:${Config.server.port}`);
 app.listen(Config.server.port);

@@ -89,6 +89,22 @@ export class JobRepository {
     return result.rows.map((row) => Job.parse(row));
   }
 
+  async findById(id: number): Promise<Job | null> {
+    const result = await this.db.execute({
+      sql: `SELECT ${JOB_COLUMNS} FROM job WHERE id = ?`,
+      args: [id],
+    });
+    if (result.rows.length === 0) return null;
+    return Job.parse(result.rows[0]);
+  }
+
+  async deleteById(id: number): Promise<void> {
+    await this.db.execute({
+      sql: `DELETE FROM job WHERE id = ?`,
+      args: [id],
+    });
+  }
+
   async listJobs(): Promise<Job[]> {
     const result = await this.db.execute(
       `SELECT ${JOB_COLUMNS} FROM job ORDER BY created_at DESC`,
