@@ -13,8 +13,9 @@ export class JobService {
     type: string,
     payload: unknown,
     runAfter?: number,
+    schedule?: string | null,
   ): Promise<number> {
-    return this.repo.createJob(type, payload, runAfter);
+    return this.repo.createJob(type, payload, runAfter, schedule);
   }
 }
 

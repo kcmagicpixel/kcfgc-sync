@@ -7,6 +7,7 @@ import { up as userMigration } from "../src/data/migrations/0001.user.migration.
 import { up as sessionMigration } from "../src/data/migrations/0002.session.migration.js";
 import { up as jobMigration } from "../src/data/migrations/0003.job.migration.js";
 import { up as tournamentMigration } from "../src/data/migrations/0004.tournament.migration.js";
+import { up as jobScheduleMigration } from "../src/data/migrations/0005.job-schedule.migration.js";
 import { Config } from "../src/config.js";
 import { initControllers } from "../src/modules/controller.js";
 
@@ -33,6 +34,7 @@ export function setupTestDb() {
     await sessionMigration(db);
     await jobMigration(db);
     await tournamentMigration(db);
+    await jobScheduleMigration(db);
 
     Container.registerSingleton("db", db);
   });

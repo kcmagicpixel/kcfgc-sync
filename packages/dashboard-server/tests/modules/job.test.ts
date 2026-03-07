@@ -3,7 +3,7 @@ import { getDb, setupTestDb } from "../setup.js";
 import { Container } from "#container";
 import { JobRepository } from "#modules/job/job.repository.js";
 import { WorkerService } from "#modules/job/worker.service.js";
-import type { Worker, WorkerSchedule } from "#modules/worker.model.js";
+import type { Worker } from "#modules/worker.model.js";
 
 setupTestDb();
 
@@ -143,7 +143,6 @@ describe("Job", () => {
       overrides: Partial<Worker> & { jobType: string },
     ): Worker {
       return {
-        schedule: { type: "once" } as WorkerSchedule,
         handle: vi.fn(async () => {}),
         ...overrides,
       };
@@ -213,17 +212,14 @@ describe("Job", () => {
       expect(jobs.some((j) => j.id === id)).toBe(true);
     });
 
-    it("recurring worker creates next job after completion", async () => {
+    it("recurring job creates next job after completion", async () => {
       const repo = Container.getInstance(JobRepository);
       const engine = createEngine();
 
-      const worker = createMockWorker({
-        jobType: "recurring-test",
-        schedule: { type: "recurring", schedule: "0 */6 * * *" },
-      });
+      const worker = createMockWorker({ jobType: "recurring-test" });
       engine.registerWorker(worker);
 
-      await repo.createJob("recurring-test", { data: 1 });
+      await repo.createJob("recurring-test", { data: 1 }, Date.now(), "0 */6 * * *");
       await (engine as any).tick();
 
       const pending = await repo.findByType("recurring-test", ["pending"]);
@@ -231,22 +227,22 @@ describe("Job", () => {
       const nextJob = pending[0];
       expect(nextJob.runAfter).toBeGreaterThan(Date.now());
       expect(nextJob.payload).toEqual({ data: 1 });
+      expect(nextJob.schedule).toBe("0 */6 * * *");
     });
 
-    it("recurring worker creates next job even after failure", async () => {
+    it("recurring job creates next job even after failure", async () => {
       const repo = Container.getInstance(JobRepository);
       const engine = createEngine();
 
       const worker = createMockWorker({
         jobType: "recurring-fail",
-        schedule: { type: "recurring", schedule: "0 0 * * *" },
         handle: vi.fn(async () => {
           throw new Error("recurring failure");
         }),
       });
       engine.registerWorker(worker);
 
-      await repo.createJob("recurring-fail", { x: 1 });
+      await repo.createJob("recurring-fail", { x: 1 }, Date.now(), "0 0 * * *");
       await (engine as any).tick();
 
       const failed = await repo.findByType("recurring-fail", ["failed"]);
@@ -255,6 +251,7 @@ describe("Job", () => {
       const pending = await repo.findByType("recurring-fail", ["pending"]);
       expect(pending.length).toBeGreaterThanOrEqual(1);
       expect(pending[0].payload).toEqual({ x: 1 });
+      expect(pending[0].schedule).toBe("0 0 * * *");
     });
 
     it("once worker does not create a follow-up job", async () => {

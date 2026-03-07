@@ -47,8 +47,8 @@ const ConfigFromEnv = z.preprocess((env: Record<any, any>) => {
       pass: env.SEED_PASS,
     },
     worker: {
-      pollIntervalMs: Number(env.WORKER_POLL_INTERVAL_MS ?? 5000),
-      staleTimeoutMs: Number(env.WORKER_STALE_TIMEOUT_MS ?? 300000),
+      pollIntervalMs: Number(env.WORKER_POLL_INTERVAL_MS),
+      staleTimeoutMs: Number(env.WORKER_STALE_TIMEOUT_MS),
     },
     startgg: {
       apiKey: env.START_GG_API_KEY,

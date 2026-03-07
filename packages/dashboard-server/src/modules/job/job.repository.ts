@@ -2,7 +2,7 @@ import type { Client } from "@libsql/client";
 import { Container } from "#container";
 import { Job, type JobState } from "./job.model.js";
 
-const JOB_COLUMNS = `id, type, state, run_after as runAfter, payload, output, created_at as createdAt, updated_at as updatedAt`;
+const JOB_COLUMNS = `id, type, state, run_after as runAfter, schedule, payload, output, created_at as createdAt, updated_at as updatedAt`;
 
 export class JobRepository {
   constructor(private readonly db: Client) {}
@@ -54,11 +54,12 @@ export class JobRepository {
     type: string,
     payload: unknown,
     runAfter: number = Date.now(),
+    schedule: string | null = null,
   ): Promise<number> {
     const now = Date.now();
     const result = await this.db.execute({
-      sql: `INSERT INTO job (type, state, run_after, payload, created_at, updated_at) VALUES (?, 'pending', ?, ?, ?, ?)`,
-      args: [type, runAfter, JSON.stringify(payload), now, now],
+      sql: `INSERT INTO job (type, state, run_after, schedule, payload, created_at, updated_at) VALUES (?, 'pending', ?, ?, ?, ?, ?)`,
+      args: [type, runAfter, schedule, JSON.stringify(payload), now, now],
     });
     return Number(result.lastInsertRowid);
   }

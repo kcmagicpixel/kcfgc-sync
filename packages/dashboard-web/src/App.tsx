@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router";
 import Jobs from "./pages/Jobs.tsx";
+import JobCreate from "./pages/JobCreate.tsx";
 import { TopNav } from "./components/TopNav.tsx";
 
 export default function App() {
@@ -10,6 +11,7 @@ export default function App() {
         <Routes>
           <Route index element={<Navigate to="/jobs" replace />} />
           <Route path="jobs" element={<Jobs />} />
+          <Route path="jobs/new" element={<JobCreate />} />
           <Route path="*" element={<Navigate to="/jobs" replace />} />
         </Routes>
       </main>

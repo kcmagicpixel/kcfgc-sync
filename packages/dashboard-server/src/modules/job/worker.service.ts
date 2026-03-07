@@ -15,7 +15,7 @@ export class WorkerService {
   constructor(private readonly repo: JobRepository) {}
 
   registerWorker(worker: Worker): void {
-    this.log.info(`Registered worker for job type: ${worker.jobType}`);
+    this.log.trace(`Registered worker for job type: ${worker.jobType}`);
     this.workers.set(worker.jobType, worker);
   }
 
@@ -73,9 +73,14 @@ export class WorkerService {
         this.log.error(err, `Job ${job.id} failed`);
       }
 
-      if (worker.schedule.type === "recurring") {
-        const nextRun = getNextCronDate(worker.schedule.schedule);
-        await this.repo.createJob(job.type, job.payload, nextRun.getTime());
+      if (job.schedule) {
+        const nextRun = getNextCronDate(job.schedule);
+        await this.repo.createJob(
+          job.type,
+          job.payload,
+          nextRun.getTime(),
+          job.schedule,
+        );
         this.log.info(
           `Scheduled next ${job.type} job for ${nextRun.toISOString()}`
         );

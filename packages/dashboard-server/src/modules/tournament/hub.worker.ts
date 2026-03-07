@@ -1,18 +1,23 @@
 import { loadHub } from "@emily-curry/fgc-sync-common";
+import { z } from "zod";
 import { Container } from "#container";
 import { Log } from "#log";
 import { JobRepository } from "../job/job.repository.js";
-import type { Worker, WorkerSchedule } from "../worker.model.js";
+import type { Worker } from "../worker.model.js";
+
+const HubPayload = z.object({
+  slug: z.string(),
+  limit: z.number().int().positive(),
+});
 
 export class HubWorker implements Worker {
   readonly jobType = "hub";
-  readonly schedule: WorkerSchedule = { type: "once" };
   private readonly log = Log.child({ module: "HubWorker" });
 
   constructor(private readonly jobRepo: JobRepository) {}
 
   async handle(payload: unknown): Promise<unknown> {
-    const { slug, limit } = payload as { slug: string; limit: number };
+    const { slug, limit } = HubPayload.parse(payload);
     const hub = await loadHub(slug, limit);
 
     this.log.info(

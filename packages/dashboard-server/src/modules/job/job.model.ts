@@ -8,6 +8,7 @@ export const Job = z.object({
   type: z.string(),
   state: JobState,
   runAfter: z.number(),
+  schedule: z.string().nullable(),
   payload: z.string().transform((s) => JSON.parse(s) as unknown),
   output: z
     .string()
