@@ -98,6 +98,18 @@ export class JobRepository {
     return Job.parse(result.rows[0]);
   }
 
+  async updatePendingJob(
+    id: number,
+    payload: unknown,
+    runAfter: number,
+  ): Promise<boolean> {
+    const result = await this.db.execute({
+      sql: `UPDATE job SET payload = ?, run_after = ?, updated_at = ? WHERE id = ? AND state = 'pending'`,
+      args: [JSON.stringify(payload), runAfter, Date.now(), id],
+    });
+    return result.rowsAffected > 0;
+  }
+
   async deleteById(id: number): Promise<void> {
     await this.db.execute({
       sql: `DELETE FROM job WHERE id = ?`,

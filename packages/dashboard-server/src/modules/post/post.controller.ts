@@ -32,6 +32,17 @@ export class PostController implements Controller {
       },
     );
 
+    app.put(
+      "/api/posts/:jobId",
+      this.session.isAuthenticated,
+      async (req, res) => {
+        const jobId = Number(req.params.jobId);
+        const { text, runAfter, imageIds, embed } = req.body;
+        await this.service.updatePost(jobId, text, runAfter, imageIds ?? [], embed);
+        res.json({ ok: true });
+      },
+    );
+
     app.post("/api/posts", this.session.isAuthenticated, async (req, res) => {
       const { providers, text, imageIds, key, runAfter, embed } = req.body;
       const ids = await this.service.createPost(

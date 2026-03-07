@@ -72,6 +72,31 @@ export class PostService {
     }
     return ids;
   }
+  async updatePost(
+    jobId: number,
+    text: string,
+    runAfter: number,
+    imageIds: number[],
+    embed?: { url: string; title: string; description?: string; imageId?: number },
+  ): Promise<void> {
+    const job = await this.jobRepo.findById(jobId);
+    if (!job || job.type !== "post") {
+      throw new Error(`Post job not found: ${jobId}`);
+    }
+    if (job.state !== "pending") {
+      throw new Error(`Can only edit pending posts`);
+    }
+    const payload = job.payload as Record<string, unknown>;
+    const updated = await this.jobRepo.updatePendingJob(
+      jobId,
+      { ...payload, text, imageIds, ...(embed ? { embed } : { embed: undefined }) },
+      runAfter,
+    );
+    if (!updated) {
+      throw new Error(`Failed to update post (may no longer be pending)`);
+    }
+  }
+
   async deletePost(jobId: number): Promise<void> {
     const job = await this.jobRepo.findById(jobId);
     if (!job || job.type !== "post") {
