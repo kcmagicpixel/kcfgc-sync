@@ -19,6 +19,20 @@ export class TournamentRepository {
     });
   }
 
+  async findByKey(key: string): Promise<TournamentRow | null> {
+    const result = await this.db.execute({
+      sql: `SELECT key, data, updated_at as updatedAt FROM tournament WHERE key = ?`,
+      args: [key],
+    });
+    if (result.rows.length === 0) return null;
+    const row = result.rows[0];
+    return {
+      key: row["key"] as string,
+      data: JSON.parse(row["data"] as string) as unknown,
+      updatedAt: row["updatedAt"] as number | null,
+    };
+  }
+
   async listAll(): Promise<TournamentRow[]> {
     const result = await this.db.execute(
       `SELECT key, data, updated_at as updatedAt FROM tournament ORDER BY key`,

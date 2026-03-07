@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router";
 import { Button } from "react-aria-components";
 import { useApi } from "../libs/hooks/use-api.hook";
 import { cn } from "../libs/utils/cn.util";
@@ -158,6 +159,7 @@ function FormattedView({ data }: { data: TournamentData }) {
 
 export default function Tournaments() {
   const apiFetch = useApi();
+  const navigate = useNavigate();
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
@@ -275,6 +277,19 @@ export default function Tournaments() {
                   )}
                 >
                   Raw JSON
+                </Button>
+                <Button
+                  onPress={async () => {
+                    const res = await apiFetch(
+                      `/api/tournaments/${selected.key}/draft-post`,
+                    );
+                    if (res.ok) {
+                      navigate("/posts/new", { state: await res.json() });
+                    }
+                  }}
+                  className="ml-auto cursor-pointer border border-foreground bg-primary px-2 py-1 text-xs font-medium text-primary-foreground shadow-xs hover:bg-primary/90 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none"
+                >
+                  Draft Post
                 </Button>
               </div>
               <div className="min-h-0 flex-1 overflow-y-auto border border-input">

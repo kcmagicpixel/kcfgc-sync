@@ -1,9 +1,17 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import { Button, Input, Label, TextField, Checkbox } from "react-aria-components";
 import { useApi } from "../libs/hooks/use-api.hook";
 import { cn } from "../libs/utils/cn.util";
 import { resizeImage } from "../libs/utils/resize-image.util";
+
+interface DraftState {
+  text: string;
+  key: string;
+  runAfter: number;
+  embed: { url: string; title: string };
+  embedImageUrl?: string;
+}
 
 interface ProviderInfo {
   name: string;
@@ -12,26 +20,36 @@ interface ProviderInfo {
 
 type AttachmentMode = "none" | "images" | "embed";
 
+function toDatetimeLocal(ms: number): string {
+  const d = new Date(ms);
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0, 16);
+}
+
 export default function PostCreate() {
   const apiFetch = useApi();
   const navigate = useNavigate();
+  const location = useLocation();
+  const draft = (location.state as DraftState | null) ?? null;
+
   const [providers, setProviders] = useState<ProviderInfo[]>([]);
   const [selectedProviders, setSelectedProviders] = useState<Set<string>>(
     new Set(),
   );
-  const [text, setText] = useState("");
-  const [key, setKey] = useState("");
-  const [runAfter, setRunAfter] = useState(() => {
-    const now = new Date();
-    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-    return now.toISOString().slice(0, 16);
-  });
-  const [attachmentMode, setAttachmentMode] = useState<AttachmentMode>("none");
+  const [text, setText] = useState(draft?.text ?? "");
+  const [key, setKey] = useState(draft?.key ?? "");
+  const [runAfter, setRunAfter] = useState(() =>
+    draft?.runAfter ? toDatetimeLocal(draft.runAfter) : toDatetimeLocal(Date.now()),
+  );
+  const [attachmentMode, setAttachmentMode] = useState<AttachmentMode>(
+    draft?.embed ? "embed" : "none",
+  );
   const [files, setFiles] = useState<File[]>([]);
-  const [embedUrl, setEmbedUrl] = useState("");
-  const [embedTitle, setEmbedTitle] = useState("");
+  const [embedUrl, setEmbedUrl] = useState(draft?.embed?.url ?? "");
+  const [embedTitle, setEmbedTitle] = useState(draft?.embed?.title ?? "");
   const [embedDescription, setEmbedDescription] = useState("");
   const [embedImage, setEmbedImage] = useState<File | null>(null);
+  const [loadingImage, setLoadingImage] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -40,6 +58,18 @@ export default function PostCreate() {
       if (res.ok) setProviders(await res.json());
     });
   }, [apiFetch]);
+
+  useEffect(() => {
+    if (!draft?.embedImageUrl) return;
+    setLoadingImage(true);
+    fetch(draft.embedImageUrl)
+      .then(async (res) => {
+        if (!res.ok) return;
+        const blob = await res.blob();
+        setEmbedImage(new File([blob], "thumbnail", { type: blob.type }));
+      })
+      .finally(() => setLoadingImage(false));
+  }, []);
 
   function toggleProvider(provider: string) {
     setSelectedProviders((prev) => {
@@ -309,6 +339,9 @@ export default function PostCreate() {
                 onChange={handleEmbedImage}
                 className="text-sm text-foreground"
               />
+              {loadingImage && (
+                <span className="text-xs text-muted-foreground">Loading thumbnail...</span>
+              )}
               {embedImage && (
                 <img
                   src={URL.createObjectURL(embedImage)}
