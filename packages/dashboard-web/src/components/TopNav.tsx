@@ -33,6 +33,12 @@ export function TopNav() {
           >
             Jobs
           </Link>
+          <Link
+            to="/users"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground"
+          >
+            Users
+          </Link>
         </div>
         <Button
           onPress={handleLogout}

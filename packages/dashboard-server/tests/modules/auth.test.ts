@@ -109,7 +109,11 @@ describe("Auth", () => {
         headers: { Cookie: cookie! },
       });
       expect(res.status).toBe(200);
-      expect(await res.json()).toEqual({ userId: 1 });
+      expect(await res.json()).toEqual({
+        userId: 1,
+        username: "admin",
+        role: "admin",
+      });
     });
   });
 });

@@ -15,6 +15,18 @@ export class SessionService {
   async destroy(sessionId: string) {
     return this.repo.deleteBySessionId(sessionId);
   }
+
+  async destroyAllByUserId(userId: number) {
+    return this.repo.deleteAllByUserId(userId);
+  }
+
+  async findAllByUserId(userId: number) {
+    return this.repo.findAllByUserId(userId);
+  }
+
+  async hardDeleteAllByUserId(userId: number) {
+    return this.repo.hardDeleteAllByUserId(userId);
+  }
 }
 
 Container.register(SessionService, [SessionRepository]);

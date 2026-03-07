@@ -4,6 +4,7 @@ export const User = z.object({
   id: z.number(),
   username: z.string(),
   passwordHash: z.string(),
+  role: z.enum(["admin", "user"]),
 });
 
 export type User = z.infer<typeof User>;

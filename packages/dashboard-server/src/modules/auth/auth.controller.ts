@@ -3,11 +3,13 @@ import type { Controller } from "../controller.model.js";
 import { Container } from "#container";
 import { AuthService } from "./auth.service.js";
 import { SessionController } from "../session/session.controller.js";
+import { UserService } from "../user/user.service.js";
 
 export class AuthController implements Controller {
   constructor(
     private readonly authService: AuthService,
-    private readonly sessionController: SessionController
+    private readonly sessionController: SessionController,
+    private readonly userService: UserService,
   ) {}
 
   async register(app: Application) {
@@ -20,7 +22,7 @@ export class AuthController implements Controller {
 
       const userId = await this.authService.validateCredentials(
         username,
-        password
+        password,
       );
       if (userId == null) {
         res.status(401).json({ error: "Invalid credentials" });
@@ -51,11 +53,16 @@ export class AuthController implements Controller {
     app.get(
       "/api/auth/me",
       this.sessionController.isAuthenticated,
-      (req, res) => {
-        res.json({ userId: req.session.userId });
-      }
+      async (req, res) => {
+        const user = await this.userService.findById(req.session.userId!);
+        if (!user) {
+          res.status(401).json({ error: "Unauthorized" });
+          return;
+        }
+        res.json({ userId: user.id, username: user.username, role: user.role });
+      },
     );
   }
 }
 
-Container.register(AuthController, [AuthService, SessionController]);
+Container.register(AuthController, [AuthService, SessionController, UserService]);

@@ -28,6 +28,29 @@ export class SessionRepository {
       args: [Date.now(), sessionId],
     });
   }
+
+  async deleteAllByUserId(userId: number): Promise<void> {
+    await this.db.execute({
+      sql: `UPDATE session SET deleted_at = ? WHERE user_id = ? AND deleted_at IS NULL`,
+      args: [Date.now(), userId],
+    });
+  }
+
+  async hardDeleteAllByUserId(userId: number): Promise<void> {
+    await this.db.execute({
+      sql: `DELETE FROM session WHERE user_id = ?`,
+      args: [userId],
+    });
+  }
+
+  async findAllByUserId(userId: number): Promise<Session[]> {
+    const result = await this.db.execute({
+      sql: `SELECT id, session_id as sessionId, user_id as userId, created_at as createdAt, deleted_at as deletedAt
+            FROM session WHERE user_id = ? AND deleted_at IS NULL ORDER BY created_at DESC`,
+      args: [userId],
+    });
+    return result.rows.map((r) => Session.parse(r));
+  }
 }
 
 Container.register(SessionRepository, ["db"]);

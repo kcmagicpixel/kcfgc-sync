@@ -1,9 +1,6 @@
 import type { Client } from "@libsql/client";
-import { randomBytes, scrypt } from "node:crypto";
-import { promisify } from "node:util";
 import { Config } from "../../config.js";
-
-const scryptAsync = promisify(scrypt);
+import { hashPassword } from "../../utils/password.util.js";
 
 export async function up(db: Client) {
   await db.execute(`
@@ -14,9 +11,7 @@ export async function up(db: Client) {
     )
   `);
 
-  const salt = randomBytes(16).toString("hex");
-  const derivedKey = (await scryptAsync(Config.seed.pass, salt, 64)) as Buffer;
-  const passwordHash = `${salt}:${derivedKey.toString("hex")}`;
+  const passwordHash = await hashPassword(Config.seed.pass);
 
   await db.execute({
     sql: `INSERT INTO user (username, password_hash) VALUES (?, ?)`,

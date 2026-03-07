@@ -11,6 +11,7 @@ import { SessionController } from "./session/session.controller.js";
 import { TournamentController } from "./tournament/tournament.controller.js";
 import { PostController } from "./post/post.controller.js";
 import { ReplacementController } from "./replacement/replacement.controller.js";
+import { UserController } from "./user/user.controller.js";
 
 /**
  * List of all controllers to register. Order may matter in some cases.
@@ -20,6 +21,7 @@ const orderedControllers: Array<Ctor<Controller>> = [
   SessionController,
   RateLimitController,
   AuthController,
+  UserController,
   JobController,
   TournamentController,
   PostController,
