@@ -127,6 +127,36 @@ describe("Job", () => {
       const jobs = await repo.listJobs();
       expect(jobs.length).toBeGreaterThan(0);
     });
+
+    it("createJob with duplicate unique_key returns null", async () => {
+      const repo = Container.getInstance(JobRepository);
+      const id1 = await repo.createJob("uk-test", {}, Date.now(), null, "my-key");
+      expect(id1).toBeTypeOf("number");
+
+      const id2 = await repo.createJob("uk-test", {}, Date.now(), null, "my-key");
+      expect(id2).toBeNull();
+    });
+
+    it("createJob succeeds after clearUniqueKey", async () => {
+      const repo = Container.getInstance(JobRepository);
+      const id1 = await repo.createJob("uk-clear", {}, Date.now(), null, "clear-key");
+      expect(id1).not.toBeNull();
+
+      await repo.clearUniqueKey(id1!);
+
+      const id2 = await repo.createJob("uk-clear", {}, Date.now(), null, "clear-key");
+      expect(id2).not.toBeNull();
+      expect(id2).not.toBe(id1);
+    });
+
+    it("createJob allows multiple null unique_keys", async () => {
+      const repo = Container.getInstance(JobRepository);
+      const id1 = await repo.createJob("uk-null", {});
+      const id2 = await repo.createJob("uk-null", {});
+      expect(id1).not.toBeNull();
+      expect(id2).not.toBeNull();
+      expect(id1).not.toBe(id2);
+    });
   });
 
   describe("WorkerService", () => {
@@ -252,6 +282,25 @@ describe("Job", () => {
       expect(pending.length).toBeGreaterThanOrEqual(1);
       expect(pending[0].payload).toEqual({ x: 1 });
       expect(pending[0].schedule).toBe("0 0 * * *");
+    });
+
+    it("recurring job with unique_key creates next job successfully", async () => {
+      const repo = Container.getInstance(JobRepository);
+      const engine = createEngine();
+
+      const worker = createMockWorker({ jobType: "recurring-uk" });
+      engine.registerWorker(worker);
+
+      await repo.createJob("recurring-uk", { v: 1 }, Date.now(), "0 */6 * * *", "recurring-uk-key");
+      await (engine as any).tick();
+
+      const pending = await repo.findByType("recurring-uk", ["pending"]);
+      expect(pending.length).toBeGreaterThanOrEqual(1);
+      expect(pending[0].uniqueKey).toBe("recurring-uk-key");
+      expect(pending[0].schedule).toBe("0 */6 * * *");
+
+      const completed = await repo.findByType("recurring-uk", ["completed"]);
+      expect(completed[0].uniqueKey).toBeNull();
     });
 
     it("once worker does not create a follow-up job", async () => {

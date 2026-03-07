@@ -2,7 +2,7 @@ import type { Client } from "@libsql/client";
 import { Container } from "#container";
 import { Job, type JobState } from "./job.model.js";
 
-const JOB_COLUMNS = `id, type, state, run_after as runAfter, schedule, payload, output, created_at as createdAt, updated_at as updatedAt`;
+const JOB_COLUMNS = `id, type, state, run_after as runAfter, schedule, unique_key as uniqueKey, payload, output, created_at as createdAt, updated_at as updatedAt`;
 
 export class JobRepository {
   constructor(private readonly db: Client) {}
@@ -55,13 +55,22 @@ export class JobRepository {
     payload: unknown,
     runAfter: number = Date.now(),
     schedule: string | null = null,
-  ): Promise<number> {
+    uniqueKey: string | null = null,
+  ): Promise<number | null> {
     const now = Date.now();
     const result = await this.db.execute({
-      sql: `INSERT INTO job (type, state, run_after, schedule, payload, created_at, updated_at) VALUES (?, 'pending', ?, ?, ?, ?, ?)`,
-      args: [type, runAfter, schedule, JSON.stringify(payload), now, now],
+      sql: `INSERT INTO job (type, state, run_after, schedule, unique_key, payload, created_at, updated_at) VALUES (?, 'pending', ?, ?, ?, ?, ?, ?) ON CONFLICT(unique_key) DO NOTHING`,
+      args: [type, runAfter, schedule, uniqueKey, JSON.stringify(payload), now, now],
     });
+    if (result.rowsAffected === 0) return null;
     return Number(result.lastInsertRowid);
+  }
+
+  async clearUniqueKey(id: number): Promise<void> {
+    await this.db.execute({
+      sql: `UPDATE job SET unique_key = NULL WHERE id = ?`,
+      args: [id],
+    });
   }
 
   async findByType(type: string, states?: JobState[]): Promise<Job[]> {

@@ -17,8 +17,8 @@ export class JobController implements Controller {
     });
 
     app.post("/api/jobs", this.session.isAuthenticated, async (req, res) => {
-      const { type, payload, runAfter, schedule } = req.body;
-      const id = await this.service.createJob(type, payload, runAfter, schedule);
+      const { type, payload, runAfter, schedule, uniqueKey } = req.body;
+      const id = await this.service.createJob(type, payload, runAfter, schedule, uniqueKey);
       res.json({ id });
     });
   }

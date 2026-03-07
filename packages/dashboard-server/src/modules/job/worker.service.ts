@@ -74,12 +74,16 @@ export class WorkerService {
       }
 
       if (job.schedule) {
+        if (job.uniqueKey) {
+          await this.repo.clearUniqueKey(job.id);
+        }
         const nextRun = getNextCronDate(job.schedule);
         await this.repo.createJob(
           job.type,
           job.payload,
           nextRun.getTime(),
           job.schedule,
+          job.uniqueKey,
         );
         this.log.info(
           `Scheduled next ${job.type} job for ${nextRun.toISOString()}`
