@@ -3,15 +3,6 @@ import { createClient, type Client } from "@libsql/client";
 import type { Server } from "node:http";
 import { initExpress } from "../src/app.js";
 import { Container } from "#container";
-import { up as userMigration } from "../src/data/migrations/0001.user.migration.js";
-import { up as sessionMigration } from "../src/data/migrations/0002.session.migration.js";
-import { up as jobMigration } from "../src/data/migrations/0003.job.migration.js";
-import { up as tournamentMigration } from "../src/data/migrations/0004.tournament.migration.js";
-import { up as jobScheduleMigration } from "../src/data/migrations/0005.job-schedule.migration.js";
-import { up as tournamentUpdatedAtMigration } from "../src/data/migrations/0006.tournament-updated-at.migration.js";
-import { up as jobUniqueKeyMigration } from "../src/data/migrations/0007.job-unique-key.migration.js";
-import { up as postMigration } from "../src/data/migrations/0008.post.migration.js";
-import { up as imageMigration } from "../src/data/migrations/0009.image.migration.js";
 import { Config } from "../src/config.js";
 import { initControllers } from "../src/modules/controller.js";
 import { MigrationsExecutor } from "../src/data/migrations.util.js";
@@ -58,6 +49,10 @@ export function setupTestServer() {
         const addr = server.address();
         if (typeof addr === "object" && addr) {
           baseUrl = `http://localhost:${addr.port}`;
+        } else if (typeof addr === "string") {
+          baseUrl = addr;
+        } else {
+          baseUrl = `http://localhost:${Config.server.port}`;
         }
         resolve();
       });

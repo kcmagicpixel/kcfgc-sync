@@ -6,10 +6,17 @@ export default defineConfig({
   test: {
     setupFiles: ["dotenv/config"],
     env: {
+      BSKY_APP_PASSWORD: "secret",
+      BSKY_USERNAME: "secret",
       DASHBOARD_PORT: "0",
       DASHBOARD_LIMIT_POINT: "0",
       DATABASE_PATH: ":memory:",
       LOG_LEVEL: "silent",
+      START_GG_API_KEY: "secret",
+      TWITTER_ACCESS_TOKEN: "secret",
+      TWITTER_ACCESS_SECRET: "secret",
+      TWITTER_APP_KEY: "secret",
+      TWITTER_APP_SECRET: "secret",
     },
   },
 });

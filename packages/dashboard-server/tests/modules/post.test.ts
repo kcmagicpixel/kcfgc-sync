@@ -5,7 +5,7 @@ import { JobRepository } from "#modules/job/job.repository.js";
 import { PostRepository } from "#modules/post/post.repository.js";
 import { ImageRepository } from "#modules/post/image.repository.js";
 import { PostWorker } from "#modules/post/post.worker.js";
-import type { PostProvider } from "#modules/post/post-provider.model.js";
+import type { PostProvider } from "#modules/post-provider/post-provider.model.js";
 
 setupTestDb();
 
@@ -78,6 +78,7 @@ describe("Post", () => {
     function createMockProvider(name: string, url: string): PostProvider {
       return {
         name,
+        enabled: true,
         post: vi.fn(async () => ({ url })),
         delete: vi.fn(async () => {}),
       };
@@ -104,7 +105,7 @@ describe("Post", () => {
       });
 
       expect(result).toEqual({ url: "https://bsky.app/test" });
-      expect(bluesky.post).toHaveBeenCalledWith("Hello world", []);
+      expect(bluesky.post).toHaveBeenCalledWith("Hello world", [], undefined);
       expect(twitter.post).not.toHaveBeenCalled();
 
       const posts = await postRepo.findByUniqueKeys(["post-bluesky-hello"]);
@@ -137,10 +138,98 @@ describe("Post", () => {
       expect(bluesky.post).toHaveBeenCalledWith(
         "With image",
         [expect.any(Buffer)],
+        undefined,
       );
 
       const remaining = await imageRepo.findByIds([imgId]);
       expect(remaining).toHaveLength(0);
+    });
+
+    it("posts with embed and passes it to provider", async () => {
+      const postRepo = Container.getInstance(PostRepository);
+      const imageRepo = Container.getInstance(ImageRepository);
+      const bluesky = createMockProvider("bluesky", "https://bsky.app/embed");
+      const twitter = createMockProvider("twitter", "https://x.com/embed");
+
+      const worker = new PostWorker(
+        postRepo,
+        imageRepo,
+        bluesky as any,
+        twitter as any,
+      );
+
+      await worker.handle({
+        provider: "bluesky",
+        text: "Check this out",
+        uniqueKey: "post-bluesky-embed",
+        embed: { url: "https://example.com", title: "Example", description: "A site" },
+      });
+
+      expect(bluesky.post).toHaveBeenCalledWith(
+        "Check this out",
+        [],
+        { url: "https://example.com", title: "Example", description: "A site", image: undefined },
+      );
+    });
+
+    it("posts with embed image and deletes it after posting", async () => {
+      const postRepo = Container.getInstance(PostRepository);
+      const imageRepo = Container.getInstance(ImageRepository);
+      const bluesky = createMockProvider("bluesky", "https://bsky.app/embedimg");
+      const twitter = createMockProvider("twitter", "https://x.com/embedimg");
+
+      const imgId = await imageRepo.insert(Buffer.from("thumb-data"), "image/png");
+
+      const worker = new PostWorker(
+        postRepo,
+        imageRepo,
+        bluesky as any,
+        twitter as any,
+      );
+
+      await worker.handle({
+        provider: "bluesky",
+        text: "With thumbnail",
+        uniqueKey: "post-bluesky-embedimg",
+        embed: { url: "https://example.com", title: "Example", imageId: imgId },
+      });
+
+      expect(bluesky.post).toHaveBeenCalledWith(
+        "With thumbnail",
+        [],
+        expect.objectContaining({
+          url: "https://example.com",
+          title: "Example",
+          image: expect.any(Buffer),
+        }),
+      );
+
+      const remaining = await imageRepo.findByIds([imgId]);
+      expect(remaining).toHaveLength(0);
+    });
+
+    it("rejects payload with both imageIds and embed", async () => {
+      const postRepo = Container.getInstance(PostRepository);
+      const imageRepo = Container.getInstance(ImageRepository);
+      const bluesky = createMockProvider("bluesky", "");
+      const twitter = createMockProvider("twitter", "");
+
+      const worker = new PostWorker(
+        postRepo,
+        imageRepo,
+        bluesky as any,
+        twitter as any,
+      );
+
+      await expect(
+        worker.handle({
+          provider: "bluesky",
+          text: "Both",
+          uniqueKey: "post-bluesky-both",
+          imageIds: [1],
+          embed: { url: "https://example.com", title: "Example" },
+        }),
+      ).rejects.toThrow();
     });
 
     it("throws on invalid payload", async () => {
@@ -224,6 +313,36 @@ describe("Post", () => {
       expect(item).toBeDefined();
       expect(item!.post).not.toBeNull();
       expect(item!.post!.url).toBe("https://bsky.app/merged");
+    });
+
+    it("createPost with embed stores embed in job payload", async () => {
+      const jobRepo = Container.getInstance(JobRepository);
+
+      const uniqueKey = "post-bluesky-embed-svc";
+      const id = await jobRepo.createJob(
+        "post",
+        {
+          provider: "bluesky",
+          text: "Embed test",
+          uniqueKey,
+          imageIds: [],
+          embed: { url: "https://example.com", title: "Example", description: "Desc" },
+        },
+        undefined,
+        null,
+        uniqueKey,
+      );
+
+      expect(id).not.toBeNull();
+      const job = await jobRepo.findById(id!);
+      expect(job).not.toBeNull();
+      const payload = job!.payload as any;
+      expect(payload.embed).toEqual({
+        url: "https://example.com",
+        title: "Example",
+        description: "Desc",
+      });
+      expect(payload.imageIds).toEqual([]);
     });
 
     it("deletePost removes job and post records for a pending job", async () => {

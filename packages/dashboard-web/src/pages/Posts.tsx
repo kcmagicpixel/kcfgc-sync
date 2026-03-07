@@ -9,6 +9,12 @@ interface PostPayload {
   text: string;
   uniqueKey: string;
   imageIds?: number[];
+  embed?: {
+    url: string;
+    title: string;
+    description?: string;
+    imageId?: number;
+  };
 }
 
 interface PostJob {
@@ -221,6 +227,31 @@ export default function Posts() {
                       ))}
                     </div>
                   )}
+
+                {selected.job.payload.embed && (
+                  <div className="flex flex-col gap-1 border border-border p-3">
+                    <span className="text-xs font-medium text-muted-foreground">Embed</span>
+                    <span className="font-medium">{selected.job.payload.embed.title}</span>
+                    {selected.job.payload.embed.description && (
+                      <span className="text-muted-foreground">{selected.job.payload.embed.description}</span>
+                    )}
+                    <a
+                      href={selected.job.payload.embed.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-primary underline"
+                    >
+                      {selected.job.payload.embed.url}
+                    </a>
+                    {selected.job.payload.embed.imageId != null && (
+                      <img
+                        src={`/api/posts/images/${selected.job.payload.embed.imageId}`}
+                        alt=""
+                        className="mt-1 h-32 w-32 border border-border object-cover"
+                      />
+                    )}
+                  </div>
+                )}
 
                 {selected.post && (
                   <div>

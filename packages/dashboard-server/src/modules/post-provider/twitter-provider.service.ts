@@ -2,13 +2,15 @@ import { TwitterApi, EUploadMimeType } from "twitter-api-v2";
 import { Config } from "#config";
 import { Container } from "#container";
 import { Log } from "#log";
-import type { PostProvider } from "./post-provider.model.js";
+import type { PostProvider, PostEmbed } from "./post-provider.model.js";
 
 export class TwitterPostProvider implements PostProvider {
   readonly name = "twitter";
+  readonly enabled = Config.twitter != null;
   private readonly log = Log.child({ module: "TwitterPostProvider" });
 
   private getClient(): TwitterApi {
+    if (!Config.twitter) throw new Error("Twitter provider is not configured");
     return new TwitterApi({
       appKey: Config.twitter.appKey,
       appSecret: Config.twitter.appSecret,
@@ -17,11 +19,23 @@ export class TwitterPostProvider implements PostProvider {
     });
   }
 
-  async post(text: string, images: Buffer[]): Promise<{ url: string }> {
+  async post(text: string, images: Buffer[], embed?: PostEmbed): Promise<{ url: string }> {
     const client = this.getClient();
 
     let mediaIds: string[] | undefined;
-    if (images.length > 0) {
+    let tweetText = text;
+
+    if (embed) {
+      // Upload embed thumbnail if present
+      if (embed.image) {
+        const mediaId = await client.v2.uploadMedia(embed.image, {
+          media_type: EUploadMimeType.Png,
+        });
+        mediaIds = [mediaId];
+      }
+      // Append embed URL to post body
+      tweetText = `${text}\n\n${embed.url}`;
+    } else if (images.length > 0) {
       mediaIds = await Promise.all(
         images.map((data) =>
           client.v2.uploadMedia(data, {
@@ -36,7 +50,7 @@ export class TwitterPostProvider implements PostProvider {
       | [string, string]
       | [string, string, string]
       | [string, string, string, string];
-    const tweet = await client.v2.tweet(text, {
+    const tweet = await client.v2.tweet(tweetText, {
       media: mediaIds ? { media_ids: mediaIds as MediaIds } : undefined,
     });
 

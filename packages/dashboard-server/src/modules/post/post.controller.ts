@@ -13,6 +13,10 @@ export class PostController implements Controller {
   ) {}
 
   async register(app: Application) {
+    app.get("/api/posts/providers", this.session.isAuthenticated, async (_req, res) => {
+      res.json(this.service.listProviders());
+    });
+
     app.get("/api/posts", this.session.isAuthenticated, async (_req, res) => {
       const posts = await this.service.listPosts();
       res.json(posts);
@@ -29,13 +33,14 @@ export class PostController implements Controller {
     );
 
     app.post("/api/posts", this.session.isAuthenticated, async (req, res) => {
-      const { providers, text, imageIds, key, runAfter } = req.body;
+      const { providers, text, imageIds, key, runAfter, embed } = req.body;
       const ids = await this.service.createPost(
         providers,
         text,
         imageIds ?? [],
         key,
         runAfter,
+        embed,
       );
       res.json({ ids });
     });
@@ -59,11 +64,21 @@ export class PostController implements Controller {
         const jobs = await this.service.listPosts();
         const refs = new Map<number, string[]>();
         for (const item of jobs) {
-          const ids = (item.job.payload as { imageIds?: number[] }).imageIds;
-          if (!ids) continue;
-          for (const id of ids) {
+          const payload = item.job.payload as {
+            imageIds?: number[];
+            embed?: { imageId?: number };
+          };
+          const ref = item.job.uniqueKey ?? `job-${item.job.id}`;
+          if (payload.imageIds) {
+            for (const id of payload.imageIds) {
+              if (!refs.has(id)) refs.set(id, []);
+              refs.get(id)!.push(ref);
+            }
+          }
+          if (payload.embed?.imageId != null) {
+            const id = payload.embed.imageId;
             if (!refs.has(id)) refs.set(id, []);
-            refs.get(id)!.push(item.job.uniqueKey ?? `job-${item.job.id}`);
+            refs.get(id)!.push(ref);
           }
         }
         res.json(

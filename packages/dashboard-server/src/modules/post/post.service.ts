@@ -28,6 +28,13 @@ export class PostService {
     ]);
   }
 
+  listProviders(): { name: string; enabled: boolean }[] {
+    return [...this.providers.values()].map((p) => ({
+      name: p.name,
+      enabled: p.enabled,
+    }));
+  }
+
   async listPosts(): Promise<PostListItem[]> {
     const jobs = await this.jobRepo.findByType("post");
     const uniqueKeys = jobs
@@ -48,14 +55,15 @@ export class PostService {
     text: string,
     imageIds: number[],
     key: string,
-    runAfter?: number
+    runAfter?: number,
+    embed?: { url: string; title: string; description?: string; imageId?: number },
   ): Promise<(number | null)[]> {
     const ids: (number | null)[] = [];
     for (const provider of providers) {
       const uniqueKey = `post-${provider}-${key}`;
       const id = await this.jobRepo.createJob(
         "post",
-        { provider, text, uniqueKey, imageIds },
+        { provider, text, uniqueKey, imageIds, ...(embed ? { embed } : {}) },
         runAfter,
         null,
         uniqueKey
