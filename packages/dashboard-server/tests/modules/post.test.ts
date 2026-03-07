@@ -71,6 +71,7 @@ describe("Post", () => {
 
   describe("PostWorker", () => {
     beforeEach(async () => {
+      await getDb().execute("DELETE FROM job WHERE type = 'post'");
       await getDb().execute("DELETE FROM post");
       await getDb().execute("DELETE FROM image");
     });
@@ -113,7 +114,7 @@ describe("Post", () => {
       expect(posts[0].url).toBe("https://bsky.app/test");
     });
 
-    it("loads images from DB and deletes them after posting", async () => {
+    it("loads images from DB and passes them to provider", async () => {
       const postRepo = Container.getInstance(PostRepository);
       const imageRepo = Container.getInstance(ImageRepository);
       const bluesky = createMockProvider("bluesky", "https://bsky.app/img");
@@ -140,9 +141,6 @@ describe("Post", () => {
         [expect.any(Buffer)],
         undefined,
       );
-
-      const remaining = await imageRepo.findByIds([imgId]);
-      expect(remaining).toHaveLength(0);
     });
 
     it("posts with embed and passes it to provider", async () => {
@@ -172,7 +170,7 @@ describe("Post", () => {
       );
     });
 
-    it("posts with embed image and deletes it after posting", async () => {
+    it("posts with embed image and passes it to provider", async () => {
       const postRepo = Container.getInstance(PostRepository);
       const imageRepo = Container.getInstance(ImageRepository);
       const bluesky = createMockProvider("bluesky", "https://bsky.app/embedimg");
@@ -203,9 +201,6 @@ describe("Post", () => {
           image: expect.any(Buffer),
         }),
       );
-
-      const remaining = await imageRepo.findByIds([imgId]);
-      expect(remaining).toHaveLength(0);
     });
 
     it("rejects payload with both imageIds and embed", async () => {

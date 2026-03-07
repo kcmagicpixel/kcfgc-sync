@@ -1,19 +1,21 @@
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { useNavigate, useLocation } from "react-router";
 
 export function useApi() {
   const navigate = useNavigate();
   const location = useLocation();
+  const pathnameRef = useRef(location.pathname);
+  pathnameRef.current = location.pathname;
 
   const apiFetch = useCallback(
     async (input: string | URL | Request, init?: RequestInit) => {
       const res = await fetch(input, init);
       if (res.status === 401) {
-        navigate("/login", { state: { from: location.pathname }, replace: true });
+        navigate("/login", { state: { from: pathnameRef.current }, replace: true });
       }
       return res;
     },
-    [navigate, location.pathname],
+    [navigate],
   );
 
   return apiFetch;

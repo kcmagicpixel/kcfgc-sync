@@ -35,7 +35,7 @@ export class PostWorker implements Worker {
     private readonly postRepo: PostRepository,
     private readonly imageRepo: ImageRepository,
     bluesky: BlueskyPostProvider,
-    twitter: TwitterPostProvider
+    twitter: TwitterPostProvider,
   ) {
     this.providers = new Map<string, PostProvider>([
       [bluesky.name, bluesky],
@@ -59,15 +59,12 @@ export class PostWorker implements Worker {
 
     // Resolve embed with image buffer if present
     let embed: PostEmbed | undefined;
-    const imageIdsToCleanup: number[] = [];
-
     if (embedPayload) {
       let image: Buffer | undefined;
       if (embedPayload.imageId != null) {
         const img = await this.imageRepo.findById(embedPayload.imageId);
         if (img) {
           image = Buffer.from(img.data);
-          imageIdsToCleanup.push(embedPayload.imageId);
         }
       }
       embed = {
@@ -82,17 +79,11 @@ export class PostWorker implements Worker {
     const images =
       imageIds.length > 0 ? await this.imageRepo.findByIds(imageIds) : [];
     const imageBuffers = images.map((img) => Buffer.from(img.data));
-    imageIdsToCleanup.push(...imageIds);
 
     const result = await provider.post(text, imageBuffers, embed);
     this.log.info(`Posted via ${providerName}: ${result.url}`);
 
     await this.postRepo.insert(uniqueKey, providerName, result.url);
-
-    if (imageIdsToCleanup.length > 0) {
-      await this.imageRepo.deleteByIds(imageIdsToCleanup);
-      this.log.trace(`Deleted ${imageIdsToCleanup.length} image(s) after posting`);
-    }
 
     return { url: result.url };
   }
