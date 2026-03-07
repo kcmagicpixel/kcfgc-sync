@@ -26,25 +26,25 @@ export class MigrationsExecutor {
       if (filenameRaw.endsWith(".map")) {
         continue;
       }
-      const filename = filenameRaw.replace(/\.[tj]s$/i, "");
+      const migrationName = filenameRaw.replace(/\.[tj]s$/i, "");
       const migrationRows = await this.db.execute(
         `SELECT * FROM migrations where name = ?`,
-        [filename]
+        [migrationName]
       );
       if (migrationRows.rows.length > 0) {
-        this.log.trace(`Skipping migration ${filename}, already executed`);
+        this.log.trace(`Skipping migration ${migrationName}, already executed`);
         continue;
       }
-      const filePath = path.join(__dirname, "migrations", filename);
+      const filePath = path.join(__dirname, "migrations", filenameRaw);
       const mod = await import(filePath);
       if (typeof mod["up"] !== "function") {
-        throw new Error(`No up function in file ${filename}`);
+        throw new Error(`No up function in file ${migrationName}`);
       }
-      this.log.info(`Executing migration ${filename}`);
+      this.log.info(`Executing migration ${migrationName}`);
       await mod["up"](this.db);
       await this.db.execute(
         `INSERT INTO migrations (name, created_at) VALUES (?, ?)`,
-        [filename, Date.now()]
+        [migrationName, Date.now()]
       );
     }
   }
