@@ -1,8 +1,8 @@
 import { Config } from "#config";
 import type { Application, RequestHandler } from "express";
 import session, { Store } from "express-session";
-import type { Controller } from "../base.controller.js";
-import { Container } from "../container.js";
+import type { Controller } from "../controller.model.js";
+import { Container } from "#container";
 import { SessionService } from "./session.service.js";
 
 declare module "express-session" {

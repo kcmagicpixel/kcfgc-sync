@@ -1,5 +1,5 @@
 import type { Client } from "@libsql/client";
-import { Container } from "../container.js";
+import { Container } from "#container";
 import { User } from "./user.model.js";
 
 export class UserRepository {

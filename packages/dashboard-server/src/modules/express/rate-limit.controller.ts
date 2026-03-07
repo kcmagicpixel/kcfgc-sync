@@ -1,8 +1,8 @@
 import { Config } from "#config";
 import type { Application, RequestHandler } from "express";
 import { RateLimiterMemory } from "rate-limiter-flexible";
-import type { Controller } from "../base.controller.js";
-import { Container } from "../container.js";
+import type { Controller } from "../controller.model.js";
+import { Container } from "#container";
 
 const UNAUTHENTICATED_MULTIPLIER = 1000;
 

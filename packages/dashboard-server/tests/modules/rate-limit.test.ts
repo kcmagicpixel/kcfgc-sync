@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { extractCookie, getBaseUrl, setupTestServer } from "../setup.js";
-import { Container } from "#modules/container.js";
+import { Container } from "#container";
 import { RateLimitController } from "#modules/express/rate-limit.controller.js";
 
 setupTestServer();

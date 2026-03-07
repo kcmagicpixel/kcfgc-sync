@@ -18,6 +18,10 @@ const ConfigSchema = z.object({
     user: z.string().min(1),
     pass: z.string().min(1),
   }),
+  worker: z.object({
+    pollIntervalMs: z.number().nonnegative(),
+    staleTimeoutMs: z.number().nonnegative(),
+  }),
   startgg: z.object({
     apiKey: z.string(),
   }),
@@ -41,6 +45,10 @@ const ConfigFromEnv = z.preprocess((env: Record<any, any>) => {
     seed: {
       user: env.SEED_USER,
       pass: env.SEED_PASS,
+    },
+    worker: {
+      pollIntervalMs: Number(env.WORKER_POLL_INTERVAL_MS ?? 5000),
+      staleTimeoutMs: Number(env.WORKER_STALE_TIMEOUT_MS ?? 300000),
     },
     startgg: {
       apiKey: env.START_GG_API_KEY,

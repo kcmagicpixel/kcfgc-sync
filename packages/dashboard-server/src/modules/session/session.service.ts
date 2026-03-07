@@ -1,4 +1,4 @@
-import { Container } from "../container.js";
+import { Container } from "#container";
 import { SessionRepository } from "./session.repository.js";
 
 export class SessionService {

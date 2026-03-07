@@ -1,6 +1,6 @@
 import type { Application } from "express";
-import type { Controller } from "../base.controller.js";
-import { Container } from "../container.js";
+import type { Controller } from "../controller.model.js";
+import { Container } from "#container";
 import { AuthService } from "./auth.service.js";
 import { SessionController } from "../session/session.controller.js";
 
@@ -43,7 +43,7 @@ export class AuthController implements Controller {
           res.status(500).json({ error: "Logout failed" });
           return;
         }
-        res.clearCookie("connect.sid");
+        res.clearCookie("userSession");
         res.json({ ok: true });
       });
     });

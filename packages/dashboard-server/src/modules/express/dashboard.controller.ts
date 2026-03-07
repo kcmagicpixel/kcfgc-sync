@@ -2,8 +2,8 @@ import type { Application } from "express";
 import express from "express";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import type { Controller } from "../base.controller.js";
-import { Container } from "../container.js";
+import type { Controller } from "../controller.model.js";
+import { Container } from "#container";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

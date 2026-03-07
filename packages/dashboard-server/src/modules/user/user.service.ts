@@ -1,4 +1,4 @@
-import { Container } from "../container.js";
+import { Container } from "#container";
 import { UserRepository } from "./user.repository.js";
 
 export class UserService {

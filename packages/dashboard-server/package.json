@@ -23,6 +23,7 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@emily-curry/fgc-sync-common": "workspace:*",
     "@libsql/client": "^0.17.0",
     "express": "^5.2.1",
     "express-session": "^1.19.0",

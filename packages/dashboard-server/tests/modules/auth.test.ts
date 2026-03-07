@@ -57,7 +57,7 @@ describe("Auth", () => {
 
       const cookie = extractCookie(res);
       expect(cookie).toBeDefined();
-      expect(cookie).toContain("connect.sid=");
+      expect(cookie).toContain("userSession=");
     });
   });
 

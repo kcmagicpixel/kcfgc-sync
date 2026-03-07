@@ -11,6 +11,7 @@
     "resolvePackageJsonImports": true,
     "paths": {
       "#config": ["./src/config.ts"],
+      "#container": ["./src/container.ts"],
       "#log": ["./src/log.ts"],
       "#modules/*": ["./src/modules/*"],
       "#utils/*": ["./src/utils/*"]

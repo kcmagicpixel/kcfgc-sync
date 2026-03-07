@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getDb, setupTestDb } from "../setup.js";
-import { Container } from "#modules/container.js";
+import { Container } from "#container";
 import { SessionRepository } from "#modules/session/session.repository.js";
 import { SessionService } from "#modules/session/session.service.js";
 

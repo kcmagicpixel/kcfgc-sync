@@ -1,6 +1,6 @@
 import { scrypt, timingSafeEqual } from "node:crypto";
 import { promisify } from "node:util";
-import { Container } from "../container.js";
+import { Container } from "#container";
 import { UserService } from "../user/user.service.js";
 
 const scryptAsync = promisify(scrypt);
