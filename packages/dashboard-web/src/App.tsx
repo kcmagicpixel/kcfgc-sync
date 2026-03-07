@@ -14,7 +14,7 @@ export default function App() {
       <TopNav />
       <main className="mx-auto max-w-250 px-4 py-6">
         <Routes>
-          <Route index element={<Navigate to="/jobs" replace />} />
+          <Route index element={<Navigate to="/posts" replace />} />
           <Route path="jobs" element={<Jobs />} />
           <Route path="jobs/new" element={<JobCreate />} />
           <Route path="tournaments" element={<Tournaments />} />
@@ -22,7 +22,7 @@ export default function App() {
           <Route path="posts/new" element={<PostCreate />} />
           <Route path="posts/images" element={<Images />} />
           <Route path="posts/replacements" element={<Replacements />} />
-          <Route path="*" element={<Navigate to="/jobs" replace />} />
+          <Route path="*" element={<Navigate to="/posts" replace />} />
         </Routes>
       </main>
     </div>

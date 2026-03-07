@@ -16,12 +16,6 @@ export function TopNav() {
       <div className="mx-auto flex h-12 max-w-250 items-center justify-between px-4">
         <div className="flex items-center gap-6">
           <Link
-            to="/jobs"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground"
-          >
-            Jobs
-          </Link>
-          <Link
             to="/posts"
             className="text-sm font-medium text-muted-foreground hover:text-foreground"
           >
@@ -32,6 +26,12 @@ export function TopNav() {
             className="text-sm font-medium text-muted-foreground hover:text-foreground"
           >
             Tournaments
+          </Link>
+          <Link
+            to="/jobs"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground"
+          >
+            Jobs
           </Link>
         </div>
         <Button
