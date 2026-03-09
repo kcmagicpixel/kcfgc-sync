@@ -16,7 +16,7 @@ export class ReplacementRepository {
 
   async findAll(): Promise<ReplacementRow[]> {
     const result = await this.db.execute(
-      `SELECT ${COLUMNS} FROM replacement ORDER BY created_at DESC`,
+      `SELECT ${COLUMNS} FROM replacement ORDER BY created_at DESC`
     );
     return result.rows.map((row) => ({
       ...(row as unknown as Omit<ReplacementRow, "output">),
@@ -37,10 +37,7 @@ export class ReplacementRepository {
     };
   }
 
-  async insert(
-    input: string,
-    output: Record<string, string>,
-  ): Promise<number> {
+  async insert(input: string, output: Record<string, string>): Promise<number> {
     const now = Date.now();
     const result = await this.db.execute({
       sql: `INSERT INTO replacement (input, output, created_at, updated_at) VALUES (?, ?, ?, ?)`,
@@ -52,7 +49,7 @@ export class ReplacementRepository {
   async update(
     id: number,
     input: string,
-    output: Record<string, string>,
+    output: Record<string, string>
   ): Promise<void> {
     await this.db.execute({
       sql: `UPDATE replacement SET input = ?, output = ?, updated_at = ? WHERE id = ?`,

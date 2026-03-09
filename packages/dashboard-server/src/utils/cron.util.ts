@@ -46,10 +46,15 @@ function parseField(field: string, min: number, max: number): Set<number> {
  * @returns The next matching Date
  * @throws If no match is found within 4 years
  */
-export function getNextCronDate(expression: string, after: Date = new Date()): Date {
+export function getNextCronDate(
+  expression: string,
+  after: Date = new Date()
+): Date {
   const parts = expression.trim().split(/\s+/);
   if (parts.length !== 5) {
-    throw new Error(`Invalid cron expression: expected 5 fields, got ${parts.length}`);
+    throw new Error(
+      `Invalid cron expression: expected 5 fields, got ${parts.length}`
+    );
   }
 
   const minutes = parseField(parts[0], 0, 59);
@@ -73,7 +78,10 @@ export function getNextCronDate(expression: string, after: Date = new Date()): D
       continue;
     }
 
-    if (!daysOfMonth.has(candidate.getDate()) || !daysOfWeek.has(candidate.getDay())) {
+    if (
+      !daysOfMonth.has(candidate.getDate()) ||
+      !daysOfWeek.has(candidate.getDay())
+    ) {
       candidate.setDate(candidate.getDate() + 1);
       candidate.setHours(0, 0, 0, 0);
       continue;
@@ -92,5 +100,7 @@ export function getNextCronDate(expression: string, after: Date = new Date()): D
     return candidate;
   }
 
-  throw new Error(`No matching cron date found within 4 years for: ${expression}`);
+  throw new Error(
+    `No matching cron date found within 4 years for: ${expression}`
+  );
 }

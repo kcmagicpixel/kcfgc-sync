@@ -10,13 +10,13 @@ function loadImage(file: File): Promise<HTMLImageElement> {
 function canvasToBlob(
   canvas: HTMLCanvasElement,
   mimeType: string,
-  quality?: number,
+  quality?: number
 ): Promise<Blob> {
   return new Promise((resolve, reject) => {
     canvas.toBlob(
       (blob) => (blob ? resolve(blob) : reject(new Error("toBlob failed"))),
       mimeType,
-      quality,
+      quality
     );
   });
 }
@@ -36,7 +36,7 @@ function blobToBase64(blob: Blob): Promise<string> {
 export async function resizeImage(
   file: File,
   maxBytes: number,
-  maxDimension: number,
+  maxDimension: number
 ): Promise<{ base64: string; mimeType: string }> {
   const img = await loadImage(file);
   const scale = Math.min(1, maxDimension / Math.max(img.width, img.height));
@@ -52,9 +52,9 @@ export async function resizeImage(
 
   // Try original mime type first
   const originalMime =
-    file.type === "image/png" || file.type === "image/webp"
-      ? file.type
-      : "image/jpeg";
+    file.type === "image/png" || file.type === "image/webp" ?
+      file.type
+    : "image/jpeg";
 
   let blob = await canvasToBlob(canvas, originalMime);
 

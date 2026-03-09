@@ -7,7 +7,7 @@ export class AuthService {
 
   async validateCredentials(
     username: string,
-    password: string,
+    password: string
   ): Promise<number | null> {
     const user = await this.userService.findByUsername(username);
     if (!user) return null;

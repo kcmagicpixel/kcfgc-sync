@@ -15,7 +15,7 @@ export class PostRepository {
   async insert(
     uniqueKey: string,
     provider: string,
-    url: string,
+    url: string
   ): Promise<void> {
     await this.db.execute({
       sql: `INSERT INTO post (unique_key, provider, url, created_at) VALUES (?, ?, ?, ?)`,

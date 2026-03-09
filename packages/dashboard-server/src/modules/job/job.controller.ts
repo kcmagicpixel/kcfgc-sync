@@ -16,19 +16,31 @@ export class JobController implements Controller {
       res.json(jobs);
     });
 
-    app.post("/api/jobs/:id/cancel", this.session.isAuthenticated, async (req, res) => {
-      const id = Number(req.params.id);
-      const cancelled = await this.service.cancelJob(id);
-      if (!cancelled) {
-        res.status(409).json({ error: "Job is not in pending state or does not exist" });
-        return;
+    app.post(
+      "/api/jobs/:id/cancel",
+      this.session.isAuthenticated,
+      async (req, res) => {
+        const id = Number(req.params.id);
+        const cancelled = await this.service.cancelJob(id);
+        if (!cancelled) {
+          res
+            .status(409)
+            .json({ error: "Job is not in pending state or does not exist" });
+          return;
+        }
+        res.json({ ok: true });
       }
-      res.json({ ok: true });
-    });
+    );
 
     app.post("/api/jobs", this.session.isAuthenticated, async (req, res) => {
       const { type, payload, runAfter, schedule, uniqueKey } = req.body;
-      const id = await this.service.createJob(type, payload, runAfter, schedule, uniqueKey);
+      const id = await this.service.createJob(
+        type,
+        payload,
+        runAfter,
+        schedule,
+        uniqueKey
+      );
       res.json({ id });
     });
   }

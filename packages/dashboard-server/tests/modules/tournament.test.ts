@@ -90,7 +90,7 @@ describe("Tournament", () => {
 
       expect(loadTournament).toHaveBeenCalledWith(
         "big-event",
-        expect.any(String),
+        expect.any(String)
       );
 
       const db = getDb();
@@ -100,7 +100,7 @@ describe("Tournament", () => {
       });
       expect(result.rows).toHaveLength(1);
       expect(JSON.parse(result.rows[0]["data"] as string)).toEqual(
-        tournamentData,
+        tournamentData
       );
     });
   });

@@ -7,7 +7,7 @@ import { ReplacementRepository } from "./replacement.repository.js";
 export class ReplacementController implements Controller {
   constructor(
     private readonly session: SessionController,
-    private readonly repo: ReplacementRepository,
+    private readonly repo: ReplacementRepository
   ) {}
 
   async register(app: Application) {
@@ -17,7 +17,7 @@ export class ReplacementController implements Controller {
       async (_req, res) => {
         const replacements = await this.repo.findAll();
         res.json(replacements);
-      },
+      }
     );
 
     app.post(
@@ -27,7 +27,7 @@ export class ReplacementController implements Controller {
         const { input, output } = req.body;
         const id = await this.repo.insert(input, output);
         res.json({ id });
-      },
+      }
     );
 
     app.put(
@@ -38,7 +38,7 @@ export class ReplacementController implements Controller {
         const { input, output } = req.body;
         await this.repo.update(id, input, output);
         res.json({ ok: true });
-      },
+      }
     );
 
     app.delete(
@@ -48,7 +48,7 @@ export class ReplacementController implements Controller {
         const id = Number(req.params.id);
         await this.repo.deleteById(id);
         res.json({ ok: true });
-      },
+      }
     );
   }
 }

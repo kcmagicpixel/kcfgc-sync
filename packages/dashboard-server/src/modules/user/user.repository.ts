@@ -25,7 +25,7 @@ export class UserRepository {
 
   async findAll(): Promise<Omit<User, "passwordHash">[]> {
     const result = await this.db.execute(
-      `SELECT id, username, role FROM user ORDER BY id`,
+      `SELECT id, username, role FROM user ORDER BY id`
     );
     return result.rows.map((row) => ({
       id: row["id"] as number,
@@ -37,7 +37,7 @@ export class UserRepository {
   async create(
     username: string,
     passwordHash: string,
-    role: string = "user",
+    role: string = "user"
   ): Promise<number> {
     const result = await this.db.execute({
       sql: `INSERT INTO user (username, password_hash, role) VALUES (?, ?, ?)`,

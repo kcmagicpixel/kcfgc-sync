@@ -25,16 +25,20 @@ const ConfigSchema = z.object({
   startgg: z.object({
     apiKey: z.string(),
   }),
-  bluesky: z.object({
-    identifier: z.string().min(1),
-    password: z.string().min(1),
-  }).nullable(),
-  twitter: z.object({
-    appKey: z.string().min(1),
-    appSecret: z.string().min(1),
-    accessToken: z.string().min(1),
-    accessSecret: z.string().min(1),
-  }).nullable(),
+  bluesky: z
+    .object({
+      identifier: z.string().min(1),
+      password: z.string().min(1),
+    })
+    .nullable(),
+  twitter: z
+    .object({
+      appKey: z.string().min(1),
+      appSecret: z.string().min(1),
+      accessToken: z.string().min(1),
+      accessSecret: z.string().min(1),
+    })
+    .nullable(),
 });
 
 const ConfigFromEnv = z.preprocess((env: Record<any, any>) => {
@@ -63,11 +67,23 @@ const ConfigFromEnv = z.preprocess((env: Record<any, any>) => {
     startgg: {
       apiKey: env.START_GG_API_KEY,
     },
-    bluesky: env.BSKY_USERNAME && env.BSKY_APP_PASSWORD
-      ? { identifier: env.BSKY_USERNAME, password: env.BSKY_APP_PASSWORD }
+    bluesky:
+      env.BSKY_USERNAME && env.BSKY_APP_PASSWORD ?
+        { identifier: env.BSKY_USERNAME, password: env.BSKY_APP_PASSWORD }
       : null,
-    twitter: env.TWITTER_APP_KEY && env.TWITTER_APP_SECRET && env.TWITTER_ACCESS_TOKEN && env.TWITTER_ACCESS_SECRET
-      ? { appKey: env.TWITTER_APP_KEY, appSecret: env.TWITTER_APP_SECRET, accessToken: env.TWITTER_ACCESS_TOKEN, accessSecret: env.TWITTER_ACCESS_SECRET }
+    twitter:
+      (
+        env.TWITTER_APP_KEY &&
+        env.TWITTER_APP_SECRET &&
+        env.TWITTER_ACCESS_TOKEN &&
+        env.TWITTER_ACCESS_SECRET
+      ) ?
+        {
+          appKey: env.TWITTER_APP_KEY,
+          appSecret: env.TWITTER_APP_SECRET,
+          accessToken: env.TWITTER_ACCESS_TOKEN,
+          accessSecret: env.TWITTER_ACCESS_SECRET,
+        }
       : null,
   } satisfies Config;
 }, ConfigSchema);

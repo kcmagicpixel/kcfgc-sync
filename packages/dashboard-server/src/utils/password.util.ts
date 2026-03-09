@@ -11,7 +11,7 @@ export async function hashPassword(password: string): Promise<string> {
 
 export async function verifyPassword(
   password: string,
-  storedHash: string,
+  storedHash: string
 ): Promise<boolean> {
   const [salt, hash] = storedHash.split(":");
   const derivedKey = (await scryptAsync(password, salt, 64)) as Buffer;

@@ -9,7 +9,7 @@ export class AuthController implements Controller {
   constructor(
     private readonly authService: AuthService,
     private readonly sessionController: SessionController,
-    private readonly userService: UserService,
+    private readonly userService: UserService
   ) {}
 
   async register(app: Application) {
@@ -22,7 +22,7 @@ export class AuthController implements Controller {
 
       const userId = await this.authService.validateCredentials(
         username,
-        password,
+        password
       );
       if (userId == null) {
         res.status(401).json({ error: "Invalid credentials" });
@@ -60,9 +60,13 @@ export class AuthController implements Controller {
           return;
         }
         res.json({ userId: user.id, username: user.username, role: user.role });
-      },
+      }
     );
   }
 }
 
-Container.register(AuthController, [AuthService, SessionController, UserService]);
+Container.register(AuthController, [
+  AuthService,
+  SessionController,
+  UserService,
+]);

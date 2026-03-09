@@ -20,7 +20,7 @@ export class ImageRepository {
 
   async findAll(): Promise<Omit<ImageRow, "data">[]> {
     const result = await this.db.execute(
-      `SELECT id, mime_type as mimeType, created_at as createdAt FROM image ORDER BY created_at DESC`,
+      `SELECT id, mime_type as mimeType, created_at as createdAt FROM image ORDER BY created_at DESC`
     );
     return result.rows as unknown as Omit<ImageRow, "data">[];
   }

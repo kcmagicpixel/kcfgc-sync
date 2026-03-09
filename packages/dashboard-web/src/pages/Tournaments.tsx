@@ -214,7 +214,6 @@ export default function Tournaments() {
       <h1 className="text-2xl font-bold">Tournaments</h1>
 
       <div className="flex gap-4" style={{ height: "calc(100vh - 10rem)" }}>
-        {/* Left pane — table */}
         <div className="flex w-full md:w-1/2 flex-col gap-2">
           <div className="flex-1 overflow-y-auto border border-foreground">
             <table className="w-full text-sm">
@@ -270,7 +269,6 @@ export default function Tournaments() {
           </div>
         </div>
 
-        {/* Right pane — detail (desktop) */}
         {!isMobile && (
           <div className="flex w-1/2 flex-col gap-2">
             {selected ?
@@ -283,7 +281,6 @@ export default function Tournaments() {
         )}
       </div>
 
-      {/* Drawer — detail (mobile) */}
       {isMobile && (
         <Drawer open={selected != null} onClose={() => setSelectedKey(null)}>
           {selected && <DetailPane />}

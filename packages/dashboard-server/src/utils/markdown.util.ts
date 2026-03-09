@@ -10,8 +10,7 @@ interface LinkFacet {
 }
 
 // Matches markdown patterns in order of priority
-const MD_PATTERN =
-  /\[([^\]]*)\]\(([^)]+)\)|\*\*(.+?)\*\*|\*(.+?)\*/g;
+const MD_PATTERN = /\[([^\]]*)\]\(([^)]+)\)|\*\*(.+?)\*\*|\*(.+?)\*/g;
 
 /**
  * Strip markdown formatting for providers that don't support rich text.

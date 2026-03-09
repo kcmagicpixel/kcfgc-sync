@@ -65,7 +65,9 @@ describe("Session", () => {
       await repo.create("repo-test-find-id", 1);
 
       const allSessions = await repo.findAllByUserId(1);
-      const target = allSessions.find((s) => s.sessionId === "repo-test-find-id")!;
+      const target = allSessions.find(
+        (s) => s.sessionId === "repo-test-find-id"
+      )!;
 
       const found = await repo.findById(target.id);
       expect(found).not.toBeNull();
@@ -84,7 +86,9 @@ describe("Session", () => {
       await repo.create("repo-test-delete-id", 1);
 
       const allSessions = await repo.findAllByUserId(1);
-      const target = allSessions.find((s) => s.sessionId === "repo-test-delete-id")!;
+      const target = allSessions.find(
+        (s) => s.sessionId === "repo-test-delete-id"
+      )!;
 
       const deleted = await repo.deleteById(target.id);
       expect(deleted).toBe(true);

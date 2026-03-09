@@ -140,7 +140,7 @@ export default function Users() {
     if (!selected) return;
     const res = await apiFetch(
       `/api/users/${selected.id}/sessions/${sessionId}`,
-      { method: "DELETE" },
+      { method: "DELETE" }
     );
     if (res.ok) {
       setSessions((prev) => prev.filter((s) => s.id !== sessionId));
@@ -188,7 +188,6 @@ export default function Users() {
       )}
 
       <div className="flex gap-4" style={{ height: "calc(100vh - 10rem)" }}>
-        {/* Left pane — table */}
         <div className="flex w-full md:w-1/2 flex-col gap-2">
           <div className="flex-1 overflow-y-auto border border-foreground">
             <table className="w-full text-sm">
@@ -243,7 +242,6 @@ export default function Users() {
           </div>
         </div>
 
-        {/* Right pane — detail (desktop) */}
         {!isMobile && (
           <div className="flex w-1/2 flex-col gap-2">
             {selected ?
@@ -256,7 +254,6 @@ export default function Users() {
         )}
       </div>
 
-      {/* Drawer — detail (mobile) */}
       {isMobile && (
         <Drawer open={selected != null} onClose={() => setSelectedId(null)}>
           {selected && <DetailPane />}

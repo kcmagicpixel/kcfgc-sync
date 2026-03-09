@@ -18,7 +18,7 @@ export class TournamentController implements Controller {
   constructor(
     private readonly session: SessionController,
     private readonly service: TournamentService,
-    private readonly repo: TournamentRepository,
+    private readonly repo: TournamentRepository
   ) {}
 
   async register(app: Application) {
@@ -28,7 +28,7 @@ export class TournamentController implements Controller {
       async (_req, res) => {
         const tournaments = await this.service.listAll();
         res.json(tournaments);
-      },
+      }
     );
 
     app.get(
@@ -51,8 +51,9 @@ export class TournamentController implements Controller {
         };
 
         const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
-        const runAfter = data.startDate
-          ? new Date(data.startDate).getTime() - TWO_DAYS_MS
+        const runAfter =
+          data.startDate ?
+            new Date(data.startDate).getTime() - TWO_DAYS_MS
           : Date.now();
 
         const bannerUrl = data.images?.find((i) => i.type === "banner")?.url;
@@ -64,7 +65,7 @@ export class TournamentController implements Controller {
           embed: { url: data.url ?? "", title: data.name ?? "" },
           ...(bannerUrl ? { embedImageUrl: bannerUrl } : {}),
         });
-      },
+      }
     );
   }
 }

@@ -129,7 +129,6 @@ export default function Jobs() {
       </div>
 
       <div className="flex gap-4" style={{ height: "calc(100vh - 10rem)" }}>
-        {/* Left pane — table */}
         <div className="flex w-full md:w-1/2 flex-col gap-2">
           <div className="flex gap-2">
             <MultiSelect
@@ -216,7 +215,6 @@ export default function Jobs() {
           </div>
         </div>
 
-        {/* Right pane — detail (desktop) */}
         {!isMobile && (
           <div className="flex w-1/2 flex-col gap-2">
             {selected ?
@@ -229,7 +227,6 @@ export default function Jobs() {
         )}
       </div>
 
-      {/* Drawer — detail (mobile) */}
       {isMobile && (
         <Drawer open={selected != null} onClose={() => setSelectedId(null)}>
           <div className="flex flex-col gap-2">{detailContent}</div>

@@ -195,7 +195,6 @@ export default function Replacements() {
           </div>
         </div>
 
-        {/* Right pane — detail / form (desktop) */}
         {!isMobile && (
           <div className="flex w-1/2 flex-col gap-2">
             <DetailPane />
@@ -203,7 +202,6 @@ export default function Replacements() {
         )}
       </div>
 
-      {/* Drawer — detail / form (mobile) */}
       {isMobile && (
         <Drawer
           open={

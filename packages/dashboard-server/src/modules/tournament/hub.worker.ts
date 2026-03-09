@@ -21,7 +21,7 @@ export class HubWorker implements Worker {
     const hub = await loadHub(slug, limit);
 
     this.log.info(
-      `Hub "${hub.name}" returned ${hub.tournaments.length} tournaments`,
+      `Hub "${hub.name}" returned ${hub.tournaments.length} tournaments`
     );
 
     for (const tournament of hub.tournaments) {

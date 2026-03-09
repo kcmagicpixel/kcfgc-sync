@@ -8,6 +8,10 @@ export interface PostEmbed {
 export interface PostProvider {
   readonly name: string;
   readonly enabled: boolean;
-  post(text: string, images: Buffer[], embed?: PostEmbed): Promise<{ url: string }>;
+  post(
+    text: string,
+    images: Buffer[],
+    embed?: PostEmbed
+  ): Promise<{ url: string }>;
   delete(url: string): Promise<void>;
 }

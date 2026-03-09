@@ -30,7 +30,7 @@ describe("Job", () => {
       const futureId = await repo.createJob(
         "future-only",
         {},
-        Date.now() + 60_000,
+        Date.now() + 60_000
       );
 
       const job = await repo.findNextPending();
@@ -130,21 +130,45 @@ describe("Job", () => {
 
     it("createJob with duplicate unique_key returns null", async () => {
       const repo = Container.getInstance(JobRepository);
-      const id1 = await repo.createJob("uk-test", {}, Date.now(), null, "my-key");
+      const id1 = await repo.createJob(
+        "uk-test",
+        {},
+        Date.now(),
+        null,
+        "my-key"
+      );
       expect(id1).toBeTypeOf("number");
 
-      const id2 = await repo.createJob("uk-test", {}, Date.now(), null, "my-key");
+      const id2 = await repo.createJob(
+        "uk-test",
+        {},
+        Date.now(),
+        null,
+        "my-key"
+      );
       expect(id2).toBeNull();
     });
 
     it("createJob succeeds after clearUniqueKey", async () => {
       const repo = Container.getInstance(JobRepository);
-      const id1 = await repo.createJob("uk-clear", {}, Date.now(), null, "clear-key");
+      const id1 = await repo.createJob(
+        "uk-clear",
+        {},
+        Date.now(),
+        null,
+        "clear-key"
+      );
       expect(id1).not.toBeNull();
 
       await repo.clearUniqueKey(id1!);
 
-      const id2 = await repo.createJob("uk-clear", {}, Date.now(), null, "clear-key");
+      const id2 = await repo.createJob(
+        "uk-clear",
+        {},
+        Date.now(),
+        null,
+        "clear-key"
+      );
       expect(id2).not.toBeNull();
       expect(id2).not.toBe(id1);
     });
@@ -170,7 +194,7 @@ describe("Job", () => {
     }
 
     function createMockWorker(
-      overrides: Partial<Worker> & { jobType: string },
+      overrides: Partial<Worker> & { jobType: string }
     ): Worker {
       return {
         handle: vi.fn(async () => {}),
@@ -183,7 +207,10 @@ describe("Job", () => {
       const engine = createEngine();
 
       const handler = vi.fn(async () => ({ done: true }));
-      const worker = createMockWorker({ jobType: "tick-test", handle: handler });
+      const worker = createMockWorker({
+        jobType: "tick-test",
+        handle: handler,
+      });
       engine.registerWorker(worker);
 
       await repo.createJob("tick-test", { key: "val" });
@@ -249,7 +276,12 @@ describe("Job", () => {
       const worker = createMockWorker({ jobType: "recurring-test" });
       engine.registerWorker(worker);
 
-      await repo.createJob("recurring-test", { data: 1 }, Date.now(), "0 */6 * * *");
+      await repo.createJob(
+        "recurring-test",
+        { data: 1 },
+        Date.now(),
+        "0 */6 * * *"
+      );
       await (engine as any).tick();
 
       const pending = await repo.findByType("recurring-test", ["pending"]);
@@ -291,7 +323,13 @@ describe("Job", () => {
       const worker = createMockWorker({ jobType: "recurring-uk" });
       engine.registerWorker(worker);
 
-      await repo.createJob("recurring-uk", { v: 1 }, Date.now(), "0 */6 * * *", "recurring-uk-key");
+      await repo.createJob(
+        "recurring-uk",
+        { v: 1 },
+        Date.now(),
+        "0 */6 * * *",
+        "recurring-uk-key"
+      );
       await (engine as any).tick();
 
       const pending = await repo.findByType("recurring-uk", ["pending"]);

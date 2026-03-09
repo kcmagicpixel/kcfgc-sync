@@ -35,7 +35,7 @@ export class TournamentRepository {
 
   async listAll(): Promise<TournamentRow[]> {
     const result = await this.db.execute(
-      `SELECT key, data, updated_at as updatedAt FROM tournament ORDER BY key`,
+      `SELECT key, data, updated_at as updatedAt FROM tournament ORDER BY key`
     );
     return result.rows.map((row) => ({
       key: row["key"] as string,

@@ -6,7 +6,10 @@ import { PostRepository } from "./post.repository.js";
 import { ImageRepository } from "./image.repository.js";
 import { BlueskyPostProvider } from "../post-provider/bluesky-provider.service.js";
 import { TwitterPostProvider } from "../post-provider/twitter-provider.service.js";
-import type { PostProvider, PostEmbed } from "../post-provider/post-provider.model.js";
+import type {
+  PostProvider,
+  PostEmbed,
+} from "../post-provider/post-provider.model.js";
 import { ReplacementRepository } from "../replacement/replacement.repository.js";
 
 const EmbedPayload = z.object({
@@ -16,16 +19,17 @@ const EmbedPayload = z.object({
   imageId: z.number().optional(),
 });
 
-const PostPayload = z.object({
-  provider: z.enum(["bluesky", "twitter"]),
-  text: z.string(),
-  uniqueKey: z.string(),
-  imageIds: z.array(z.number()).default([]),
-  embed: EmbedPayload.optional(),
-}).refine(
-  (data) => !(data.imageIds.length > 0 && data.embed),
-  { message: "Cannot have both imageIds and embed" },
-);
+const PostPayload = z
+  .object({
+    provider: z.enum(["bluesky", "twitter"]),
+    text: z.string(),
+    uniqueKey: z.string(),
+    imageIds: z.array(z.number()).default([]),
+    embed: EmbedPayload.optional(),
+  })
+  .refine((data) => !(data.imageIds.length > 0 && data.embed), {
+    message: "Cannot have both imageIds and embed",
+  });
 
 export class PostWorker implements Worker {
   readonly jobType = "post";
@@ -37,7 +41,7 @@ export class PostWorker implements Worker {
     private readonly imageRepo: ImageRepository,
     private readonly replacementRepo: ReplacementRepository,
     bluesky: BlueskyPostProvider,
-    twitter: TwitterPostProvider,
+    twitter: TwitterPostProvider
   ) {
     this.providers = new Map<string, PostProvider>([
       [bluesky.name, bluesky],
@@ -87,7 +91,10 @@ export class PostWorker implements Worker {
     let processedText = text;
     for (const r of replacements) {
       if (r.output[providerName] != null) {
-        processedText = processedText.replaceAll(r.input, r.output[providerName]);
+        processedText = processedText.replaceAll(
+          r.input,
+          r.output[providerName]
+        );
       }
     }
 

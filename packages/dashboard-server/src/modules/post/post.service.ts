@@ -56,7 +56,12 @@ export class PostService {
     imageIds: number[],
     key: string,
     runAfter?: number,
-    embed?: { url: string; title: string; description?: string; imageId?: number },
+    embed?: {
+      url: string;
+      title: string;
+      description?: string;
+      imageId?: number;
+    }
   ): Promise<(number | null)[]> {
     const ids: (number | null)[] = [];
     for (const provider of providers) {
@@ -77,7 +82,12 @@ export class PostService {
     text: string,
     runAfter: number,
     imageIds: number[],
-    embed?: { url: string; title: string; description?: string; imageId?: number },
+    embed?: {
+      url: string;
+      title: string;
+      description?: string;
+      imageId?: number;
+    }
   ): Promise<void> {
     const job = await this.jobRepo.findById(jobId);
     if (!job || job.type !== "post") {
@@ -89,8 +99,13 @@ export class PostService {
     const payload = job.payload as Record<string, unknown>;
     const updated = await this.jobRepo.updatePendingJob(
       jobId,
-      { ...payload, text, imageIds, ...(embed ? { embed } : { embed: undefined }) },
-      runAfter,
+      {
+        ...payload,
+        text,
+        imageIds,
+        ...(embed ? { embed } : { embed: undefined }),
+      },
+      runAfter
     );
     if (!updated) {
       throw new Error(`Failed to update post (may no longer be pending)`);

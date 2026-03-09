@@ -3,7 +3,10 @@ import { extractCookie, getBaseUrl, setupTestServer } from "../setup.js";
 
 setupTestServer();
 
-const ADMIN_CREDS = { username: "admin", password: "asrtein398202ntarseitm2390" };
+const ADMIN_CREDS = {
+  username: "admin",
+  password: "asrtein398202ntarseitm2390",
+};
 
 async function login(creds: { username: string; password: string }) {
   const res = await fetch(`${getBaseUrl()}/api/auth/login`, {
@@ -35,7 +38,7 @@ describe("Users", () => {
       expect(users).toEqual(
         expect.arrayContaining([
           expect.objectContaining({ username: "admin", role: "admin" }),
-        ]),
+        ])
       );
       // Should not include passwordHash
       for (const u of users) {
@@ -78,7 +81,10 @@ describe("Users", () => {
     });
 
     it("returns 403 for non-admin", async () => {
-      const cookie = await login({ username: "testuser", password: "testpass123" });
+      const cookie = await login({
+        username: "testuser",
+        password: "testpass123",
+      });
       const res = await fetch(`${getBaseUrl()}/api/users`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Cookie: cookie },
@@ -90,7 +96,10 @@ describe("Users", () => {
 
   describe("PUT /api/users/:id/password", () => {
     it("non-admin can change own password", async () => {
-      const cookie = await login({ username: "testuser", password: "testpass123" });
+      const cookie = await login({
+        username: "testuser",
+        password: "testpass123",
+      });
       // Get own user id
       const meRes = await fetch(`${getBaseUrl()}/api/auth/me`, {
         headers: { Cookie: cookie },
@@ -120,7 +129,10 @@ describe("Users", () => {
     });
 
     it("non-admin cannot change another user's password", async () => {
-      const cookie = await login({ username: "testuser", password: "newpass456" });
+      const cookie = await login({
+        username: "testuser",
+        password: "newpass456",
+      });
       // Admin is user id 1
       const res = await fetch(`${getBaseUrl()}/api/users/1/password`, {
         method: "PUT",
@@ -145,7 +157,7 @@ describe("Users", () => {
           method: "PUT",
           headers: { "Content-Type": "application/json", Cookie: cookie },
           body: JSON.stringify({ password: "adminset789" }),
-        },
+        }
       );
       expect(res.status).toBe(200);
 
@@ -201,7 +213,7 @@ describe("Users", () => {
       // Get testuser's sessions
       const sessionsRes = await fetch(
         `${getBaseUrl()}/api/users/${testUser.id}/sessions`,
-        { headers: { Cookie: adminCookie } },
+        { headers: { Cookie: adminCookie } }
       );
       const sessions = await json<any[]>(sessionsRes);
       expect(sessions.length).toBeGreaterThan(0);
@@ -210,21 +222,26 @@ describe("Users", () => {
       // Admin revokes it
       const res = await fetch(
         `${getBaseUrl()}/api/users/${testUser.id}/sessions/${targetSession.id}`,
-        { method: "DELETE", headers: { Cookie: adminCookie } },
+        { method: "DELETE", headers: { Cookie: adminCookie } }
       );
       expect(res.status).toBe(200);
 
       // Session should be gone from the list
       const afterRes = await fetch(
         `${getBaseUrl()}/api/users/${testUser.id}/sessions`,
-        { headers: { Cookie: adminCookie } },
+        { headers: { Cookie: adminCookie } }
       );
       const afterSessions = await json<any[]>(afterRes);
-      expect(afterSessions.find((s) => s.id === targetSession.id)).toBeUndefined();
+      expect(
+        afterSessions.find((s) => s.id === targetSession.id)
+      ).toBeUndefined();
     });
 
     it("non-admin can revoke own session", async () => {
-      const testCookie = await login({ username: "testuser", password: "adminset789" });
+      const testCookie = await login({
+        username: "testuser",
+        password: "adminset789",
+      });
       const meRes = await fetch(`${getBaseUrl()}/api/auth/me`, {
         headers: { Cookie: testCookie },
       });
@@ -233,7 +250,7 @@ describe("Users", () => {
       // Get own sessions
       const sessionsRes = await fetch(
         `${getBaseUrl()}/api/users/${userId}/sessions`,
-        { headers: { Cookie: testCookie } },
+        { headers: { Cookie: testCookie } }
       );
       const sessions = await json<any[]>(sessionsRes);
       expect(sessions.length).toBeGreaterThan(0);
@@ -242,13 +259,16 @@ describe("Users", () => {
       // Revoke own session
       const res = await fetch(
         `${getBaseUrl()}/api/users/${userId}/sessions/${targetSession.id}`,
-        { method: "DELETE", headers: { Cookie: testCookie } },
+        { method: "DELETE", headers: { Cookie: testCookie } }
       );
       expect(res.status).toBe(200);
     });
 
     it("non-admin cannot revoke another user's session", async () => {
-      const testCookie = await login({ username: "testuser", password: "adminset789" });
+      const testCookie = await login({
+        username: "testuser",
+        password: "adminset789",
+      });
       // Admin is user id 1, get admin sessions
       const adminCookie = await login(ADMIN_CREDS);
       const sessionsRes = await fetch(`${getBaseUrl()}/api/users/1/sessions`, {
@@ -260,7 +280,7 @@ describe("Users", () => {
       // Try to revoke admin's session as testuser
       const res = await fetch(
         `${getBaseUrl()}/api/users/1/sessions/${sessions[0].id}`,
-        { method: "DELETE", headers: { Cookie: testCookie } },
+        { method: "DELETE", headers: { Cookie: testCookie } }
       );
       expect(res.status).toBe(403);
     });
@@ -283,7 +303,7 @@ describe("Users", () => {
       const { userId: adminId } = await json<{ userId: number }>(meRes);
       const sessionsRes = await fetch(
         `${getBaseUrl()}/api/users/${adminId}/sessions`,
-        { headers: { Cookie: adminCookie } },
+        { headers: { Cookie: adminCookie } }
       );
       const sessions = await json<any[]>(sessionsRes);
       expect(sessions.length).toBeGreaterThan(0);
@@ -298,7 +318,7 @@ describe("Users", () => {
       // Try to delete admin's session via testuser's URL
       const res = await fetch(
         `${getBaseUrl()}/api/users/${testUser.id}/sessions/${sessions[0].id}`,
-        { method: "DELETE", headers: { Cookie: adminCookie } },
+        { method: "DELETE", headers: { Cookie: adminCookie } }
       );
       expect(res.status).toBe(404);
     });
@@ -306,7 +326,10 @@ describe("Users", () => {
 
   describe("DELETE /api/users/:id", () => {
     it("returns 403 for non-admin", async () => {
-      const cookie = await login({ username: "testuser", password: "adminset789" });
+      const cookie = await login({
+        username: "testuser",
+        password: "adminset789",
+      });
       const res = await fetch(`${getBaseUrl()}/api/users/1`, {
         method: "DELETE",
         headers: { Cookie: cookie },

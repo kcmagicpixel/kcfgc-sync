@@ -1,6 +1,12 @@
 import { z } from "zod";
 
-export const JobState = z.enum(["pending", "running", "completed", "failed", "cancelled"]);
+export const JobState = z.enum([
+  "pending",
+  "running",
+  "completed",
+  "failed",
+  "cancelled",
+]);
 export type JobState = z.infer<typeof JobState>;
 
 export const Job = z.object({

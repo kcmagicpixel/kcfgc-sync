@@ -63,7 +63,7 @@ describe("getNextCronDate", () => {
 
   it("throws on invalid expression with wrong field count", () => {
     expect(() => getNextCronDate("* * *", after)).toThrow(
-      "expected 5 fields, got 3",
+      "expected 5 fields, got 3"
     );
   });
 });

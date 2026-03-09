@@ -9,13 +9,17 @@ export class PostController implements Controller {
   constructor(
     private readonly session: SessionController,
     private readonly service: PostService,
-    private readonly imageRepo: ImageRepository,
+    private readonly imageRepo: ImageRepository
   ) {}
 
   async register(app: Application) {
-    app.get("/api/posts/providers", this.session.isAuthenticated, async (_req, res) => {
-      res.json(this.service.listProviders());
-    });
+    app.get(
+      "/api/posts/providers",
+      this.session.isAuthenticated,
+      async (_req, res) => {
+        res.json(this.service.listProviders());
+      }
+    );
 
     app.get("/api/posts", this.session.isAuthenticated, async (_req, res) => {
       const posts = await this.service.listPosts();
@@ -29,7 +33,7 @@ export class PostController implements Controller {
         const jobId = Number(req.params.jobId);
         await this.service.deletePost(jobId);
         res.json({ ok: true });
-      },
+      }
     );
 
     app.put(
@@ -38,9 +42,15 @@ export class PostController implements Controller {
       async (req, res) => {
         const jobId = Number(req.params.jobId);
         const { text, runAfter, imageIds, embed } = req.body;
-        await this.service.updatePost(jobId, text, runAfter, imageIds ?? [], embed);
+        await this.service.updatePost(
+          jobId,
+          text,
+          runAfter,
+          imageIds ?? [],
+          embed
+        );
         res.json({ ok: true });
-      },
+      }
     );
 
     app.post("/api/posts", this.session.isAuthenticated, async (req, res) => {
@@ -51,7 +61,7 @@ export class PostController implements Controller {
         imageIds ?? [],
         key,
         runAfter,
-        embed,
+        embed
       );
       res.json({ ids });
     });
@@ -64,7 +74,7 @@ export class PostController implements Controller {
         const buffer = Buffer.from(data, "base64");
         const id = await this.imageRepo.insert(buffer, mimeType);
         res.json({ id });
-      },
+      }
     );
 
     app.get(
@@ -96,9 +106,9 @@ export class PostController implements Controller {
           images.map((img) => ({
             ...img,
             references: refs.get(img.id) ?? [],
-          })),
+          }))
         );
-      },
+      }
     );
 
     app.get(
@@ -113,7 +123,7 @@ export class PostController implements Controller {
         }
         res.set("Content-Type", image.mimeType);
         res.send(Buffer.from(image.data));
-      },
+      }
     );
 
     app.delete(
@@ -123,7 +133,7 @@ export class PostController implements Controller {
         const id = Number(req.params.id);
         await this.imageRepo.deleteByIds([id]);
         res.json({ ok: true });
-      },
+      }
     );
   }
 }

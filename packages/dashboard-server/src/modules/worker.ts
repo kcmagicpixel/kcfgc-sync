@@ -10,7 +10,11 @@ import { PostWorker } from "./post/post.worker.js";
  * List of all worker types to register. These must all be enumerated
  * here or else will be tree-shaken away.
  */
-const workerTypes: Array<Ctor<Worker>> = [HubWorker, TournamentWorker, PostWorker];
+const workerTypes: Array<Ctor<Worker>> = [
+  HubWorker,
+  TournamentWorker,
+  PostWorker,
+];
 
 export function initWorkers(): WorkerService {
   const engine = Container.getInstance(WorkerService);

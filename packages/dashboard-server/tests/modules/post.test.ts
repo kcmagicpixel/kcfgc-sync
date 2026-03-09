@@ -45,7 +45,11 @@ describe("Post", () => {
   describe("PostRepository", () => {
     it("inserts and retrieves a post by unique key", async () => {
       const repo = Container.getInstance(PostRepository);
-      await repo.insert("post-bluesky-test1", "bluesky", "https://bsky.app/example");
+      await repo.insert(
+        "post-bluesky-test1",
+        "bluesky",
+        "https://bsky.app/example"
+      );
 
       const posts = await repo.findByUniqueKeys(["post-bluesky-test1"]);
       expect(posts).toHaveLength(1);
@@ -99,7 +103,7 @@ describe("Post", () => {
         imageRepo,
         replacementRepo,
         bluesky as any,
-        twitter as any,
+        twitter as any
       );
 
       const result = await worker.handle({
@@ -124,7 +128,10 @@ describe("Post", () => {
       const bluesky = createMockProvider("bluesky", "https://bsky.app/img");
       const twitter = createMockProvider("twitter", "https://x.com/img");
 
-      const imgId = await imageRepo.insert(Buffer.from("test-image"), "image/png");
+      const imgId = await imageRepo.insert(
+        Buffer.from("test-image"),
+        "image/png"
+      );
 
       const replacementRepo = Container.getInstance(ReplacementRepository);
       const worker = new PostWorker(
@@ -132,7 +139,7 @@ describe("Post", () => {
         imageRepo,
         replacementRepo,
         bluesky as any,
-        twitter as any,
+        twitter as any
       );
 
       await worker.handle({
@@ -145,7 +152,7 @@ describe("Post", () => {
       expect(bluesky.post).toHaveBeenCalledWith(
         "With image",
         [expect.any(Buffer)],
-        undefined,
+        undefined
       );
     });
 
@@ -161,30 +168,41 @@ describe("Post", () => {
         imageRepo,
         replacementRepo,
         bluesky as any,
-        twitter as any,
+        twitter as any
       );
 
       await worker.handle({
         provider: "bluesky",
         text: "Check this out",
         uniqueKey: "post-bluesky-embed",
-        embed: { url: "https://example.com", title: "Example", description: "A site" },
+        embed: {
+          url: "https://example.com",
+          title: "Example",
+          description: "A site",
+        },
       });
 
-      expect(bluesky.post).toHaveBeenCalledWith(
-        "Check this out",
-        [],
-        { url: "https://example.com", title: "Example", description: "A site", image: undefined },
-      );
+      expect(bluesky.post).toHaveBeenCalledWith("Check this out", [], {
+        url: "https://example.com",
+        title: "Example",
+        description: "A site",
+        image: undefined,
+      });
     });
 
     it("posts with embed image and passes it to provider", async () => {
       const postRepo = Container.getInstance(PostRepository);
       const imageRepo = Container.getInstance(ImageRepository);
-      const bluesky = createMockProvider("bluesky", "https://bsky.app/embedimg");
+      const bluesky = createMockProvider(
+        "bluesky",
+        "https://bsky.app/embedimg"
+      );
       const twitter = createMockProvider("twitter", "https://x.com/embedimg");
 
-      const imgId = await imageRepo.insert(Buffer.from("thumb-data"), "image/png");
+      const imgId = await imageRepo.insert(
+        Buffer.from("thumb-data"),
+        "image/png"
+      );
 
       const replacementRepo = Container.getInstance(ReplacementRepository);
       const worker = new PostWorker(
@@ -192,7 +210,7 @@ describe("Post", () => {
         imageRepo,
         replacementRepo,
         bluesky as any,
-        twitter as any,
+        twitter as any
       );
 
       await worker.handle({
@@ -209,7 +227,7 @@ describe("Post", () => {
           url: "https://example.com",
           title: "Example",
           image: expect.any(Buffer),
-        }),
+        })
       );
     });
 
@@ -225,7 +243,7 @@ describe("Post", () => {
         imageRepo,
         replacementRepo,
         bluesky as any,
-        twitter as any,
+        twitter as any
       );
 
       await expect(
@@ -235,7 +253,7 @@ describe("Post", () => {
           uniqueKey: "post-bluesky-both",
           imageIds: [1],
           embed: { url: "https://example.com", title: "Example" },
-        }),
+        })
       ).rejects.toThrow();
     });
 
@@ -251,7 +269,7 @@ describe("Post", () => {
         imageRepo,
         replacementRepo,
         bluesky as any,
-        twitter as any,
+        twitter as any
       );
 
       await expect(worker.handle({ invalid: true })).rejects.toThrow();
@@ -278,7 +296,7 @@ describe("Post", () => {
           { provider, text: "Hello", uniqueKey, imageIds: [] },
           undefined,
           null,
-          uniqueKey,
+          uniqueKey
         );
         ids.push(id);
       }
@@ -298,12 +316,21 @@ describe("Post", () => {
 
       await jobRepo.createJob(
         "post",
-        { provider: "bluesky", text: "Test", uniqueKey: "post-bluesky-merge", imageIds: [] },
+        {
+          provider: "bluesky",
+          text: "Test",
+          uniqueKey: "post-bluesky-merge",
+          imageIds: [],
+        },
         undefined,
         null,
-        "post-bluesky-merge",
+        "post-bluesky-merge"
       );
-      await postRepo.insert("post-bluesky-merge", "bluesky", "https://bsky.app/merged");
+      await postRepo.insert(
+        "post-bluesky-merge",
+        "bluesky",
+        "https://bsky.app/merged"
+      );
 
       const jobs = await jobRepo.findByType("post");
       const uniqueKeys = jobs
@@ -334,11 +361,15 @@ describe("Post", () => {
           text: "Embed test",
           uniqueKey,
           imageIds: [],
-          embed: { url: "https://example.com", title: "Example", description: "Desc" },
+          embed: {
+            url: "https://example.com",
+            title: "Example",
+            description: "Desc",
+          },
         },
         undefined,
         null,
-        uniqueKey,
+        uniqueKey
       );
 
       expect(id).not.toBeNull();
@@ -358,10 +389,15 @@ describe("Post", () => {
 
       const jobId = await jobRepo.createJob(
         "post",
-        { provider: "bluesky", text: "To delete", uniqueKey: "post-bluesky-delpend", imageIds: [] },
+        {
+          provider: "bluesky",
+          text: "To delete",
+          uniqueKey: "post-bluesky-delpend",
+          imageIds: [],
+        },
         undefined,
         null,
-        "post-bluesky-delpend",
+        "post-bluesky-delpend"
       );
 
       expect(jobId).not.toBeNull();
@@ -377,13 +413,22 @@ describe("Post", () => {
 
       const jobId = await jobRepo.createJob(
         "post",
-        { provider: "bluesky", text: "Completed", uniqueKey: "post-bluesky-delcomp", imageIds: [] },
+        {
+          provider: "bluesky",
+          text: "Completed",
+          uniqueKey: "post-bluesky-delcomp",
+          imageIds: [],
+        },
         undefined,
         null,
-        "post-bluesky-delcomp",
+        "post-bluesky-delcomp"
       );
       await jobRepo.completeJob(jobId!, { url: "https://bsky.app/delcomp" });
-      await postRepo.insert("post-bluesky-delcomp", "bluesky", "https://bsky.app/delcomp");
+      await postRepo.insert(
+        "post-bluesky-delcomp",
+        "bluesky",
+        "https://bsky.app/delcomp"
+      );
 
       // Delete both records
       await postRepo.deleteByUniqueKey("post-bluesky-delcomp");

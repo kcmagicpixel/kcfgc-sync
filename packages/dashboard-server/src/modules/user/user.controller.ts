@@ -7,7 +7,7 @@ import { UserService } from "./user.service.js";
 export class UserController implements Controller {
   constructor(
     private readonly session: SessionController,
-    private readonly userService: UserService,
+    private readonly userService: UserService
   ) {}
 
   private async requireAdmin(req: Request, res: Response): Promise<boolean> {
@@ -20,42 +20,34 @@ export class UserController implements Controller {
   }
 
   async register(app: Application) {
-    app.get(
-      "/api/users",
-      this.session.isAuthenticated,
-      async (_req, res) => {
-        const users = await this.userService.findAll();
-        res.json(users);
-      },
-    );
+    app.get("/api/users", this.session.isAuthenticated, async (_req, res) => {
+      const users = await this.userService.findAll();
+      res.json(users);
+    });
 
-    app.post(
-      "/api/users",
-      this.session.isAuthenticated,
-      async (req, res) => {
-        if (!(await this.requireAdmin(req, res))) return;
+    app.post("/api/users", this.session.isAuthenticated, async (req, res) => {
+      if (!(await this.requireAdmin(req, res))) return;
 
-        const { username, password } = req.body;
-        if (!username || !password) {
-          res.status(400).json({ error: "Username and password required" });
+      const { username, password } = req.body;
+      if (!username || !password) {
+        res.status(400).json({ error: "Username and password required" });
+        return;
+      }
+
+      try {
+        const id = await this.userService.create(username, password);
+        res.json({ id });
+      } catch (err: any) {
+        if (
+          err.code === "SQLITE_CONSTRAINT_UNIQUE" ||
+          err.message?.includes("UNIQUE constraint failed")
+        ) {
+          res.status(409).json({ error: "Username already exists" });
           return;
         }
-
-        try {
-          const id = await this.userService.create(username, password);
-          res.json({ id });
-        } catch (err: any) {
-          if (
-            err.code === "SQLITE_CONSTRAINT_UNIQUE" ||
-            err.message?.includes("UNIQUE constraint failed")
-          ) {
-            res.status(409).json({ error: "Username already exists" });
-            return;
-          }
-          throw err;
-        }
-      },
-    );
+        throw err;
+      }
+    });
 
     app.put(
       "/api/users/:id/password",
@@ -76,7 +68,7 @@ export class UserController implements Controller {
 
         await this.userService.updatePassword(targetId, password);
         res.json({ ok: true });
-      },
+      }
     );
 
     app.delete(
@@ -93,7 +85,7 @@ export class UserController implements Controller {
 
         await this.userService.deleteById(targetId);
         res.json({ ok: true });
-      },
+      }
     );
 
     app.get(
@@ -101,10 +93,10 @@ export class UserController implements Controller {
       this.session.isAuthenticated,
       async (req, res) => {
         const sessions = await this.userService.findSessionsByUserId(
-          Number(req.params.id),
+          Number(req.params.id)
         );
         res.json(sessions);
-      },
+      }
     );
 
     app.delete(
@@ -127,7 +119,7 @@ export class UserController implements Controller {
 
         await this.userService.deleteSession(sessionId);
         res.json({ ok: true });
-      },
+      }
     );
   }
 }

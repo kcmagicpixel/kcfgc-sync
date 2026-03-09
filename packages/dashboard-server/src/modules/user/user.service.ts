@@ -6,7 +6,7 @@ import { UserRepository } from "./user.repository.js";
 export class UserService {
   constructor(
     private readonly repo: UserRepository,
-    private readonly sessionService: SessionService,
+    private readonly sessionService: SessionService
   ) {}
 
   async findByUsername(username: string) {

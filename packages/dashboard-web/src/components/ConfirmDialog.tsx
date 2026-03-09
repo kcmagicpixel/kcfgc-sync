@@ -63,9 +63,9 @@ export function ConfirmDialog({
                     }}
                     isDisabled={confirming}
                     className={`cursor-pointer border px-4 py-2 text-sm font-medium shadow-xs pressed:translate-x-px pressed:translate-y-px pressed:shadow-none disabled:opacity-50 ${
-                      variant === "destructive"
-                        ? "border-destructive bg-destructive/10 text-destructive hover:bg-destructive/20"
-                        : "border-foreground bg-primary text-primary-foreground hover:bg-primary/90"
+                      variant === "destructive" ?
+                        "border-destructive bg-destructive/10 text-destructive hover:bg-destructive/20"
+                      : "border-foreground bg-primary text-primary-foreground hover:bg-primary/90"
                     }`}
                   >
                     {confirming ? "..." : confirmLabel}

@@ -33,9 +33,9 @@ export class JobRepository {
 
   async failJob(id: number, error: unknown): Promise<void> {
     const output =
-      error instanceof Error
-        ? { message: error.message, stack: error.stack }
-        : { message: String(error) };
+      error instanceof Error ?
+        { message: error.message, stack: error.stack }
+      : { message: String(error) };
     await this.db.execute({
       sql: `UPDATE job SET state = 'failed', output = ?, updated_at = ? WHERE id = ?`,
       args: [JSON.stringify(output), Date.now(), id],
@@ -55,12 +55,20 @@ export class JobRepository {
     payload: unknown,
     runAfter: number = Date.now(),
     schedule: string | null = null,
-    uniqueKey: string | null = null,
+    uniqueKey: string | null = null
   ): Promise<number | null> {
     const now = Date.now();
     const result = await this.db.execute({
       sql: `INSERT INTO job (type, state, run_after, schedule, unique_key, payload, created_at, updated_at) VALUES (?, 'pending', ?, ?, ?, ?, ?, ?) ON CONFLICT(unique_key) DO NOTHING`,
-      args: [type, runAfter, schedule, uniqueKey, JSON.stringify(payload), now, now],
+      args: [
+        type,
+        runAfter,
+        schedule,
+        uniqueKey,
+        JSON.stringify(payload),
+        now,
+        now,
+      ],
     });
     if (result.rowsAffected === 0) return null;
     return Number(result.lastInsertRowid);
@@ -109,7 +117,7 @@ export class JobRepository {
   async updatePendingJob(
     id: number,
     payload: unknown,
-    runAfter: number,
+    runAfter: number
   ): Promise<boolean> {
     const result = await this.db.execute({
       sql: `UPDATE job SET payload = ?, run_after = ?, updated_at = ? WHERE id = ? AND state = 'pending'`,
@@ -127,7 +135,7 @@ export class JobRepository {
 
   async listJobs(): Promise<Job[]> {
     const result = await this.db.execute(
-      `SELECT ${JOB_COLUMNS} FROM job ORDER BY created_at DESC`,
+      `SELECT ${JOB_COLUMNS} FROM job ORDER BY created_at DESC`
     );
     return result.rows.map((row) => Job.parse(row));
   }
