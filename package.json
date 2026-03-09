@@ -15,7 +15,9 @@
     "format": "pnpm -r --parallel run format",
     "lint": "eslint",
     "clean": "pnpm -r --parallel run clean",
-    "purge": "pnpm -r --parallel run purge && rm -rf node_modules"
+    "purge": "pnpm -r --parallel run purge && rm -rf node_modules",
+    "docker:build": "docker build -t fgc-sync .",
+    "docker:run": "docker run --rm --name fgc-sync-dashboard --env-file ./packages/dashboard-server/.env -e DATABASE_PATH=file:/data/db.sqlite --volume=./tmp:/data -p 3030:3030 fgc-sync"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
