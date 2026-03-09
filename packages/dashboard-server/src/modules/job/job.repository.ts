@@ -73,6 +73,14 @@ export class JobRepository {
     });
   }
 
+  async cancelJob(id: number): Promise<boolean> {
+    const result = await this.db.execute({
+      sql: `UPDATE job SET state = 'cancelled', updated_at = ? WHERE id = ? AND state = 'pending'`,
+      args: [Date.now(), id],
+    });
+    return result.rowsAffected > 0;
+  }
+
   async findByType(type: string, states?: JobState[]): Promise<Job[]> {
     if (states && states.length > 0) {
       const placeholders = states.map(() => "?").join(", ");

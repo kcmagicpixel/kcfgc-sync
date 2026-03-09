@@ -31,6 +31,12 @@ export default function Jobs() {
   const [stateFilter, setStateFilter] = useState<Set<string>>(new Set());
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
+  const refreshJobs = () => {
+    apiFetch("/api/jobs").then(async (res) => {
+      if (res.ok) setJobs(await res.json());
+    });
+  };
+
   useEffect(() => {
     let cancelled = false;
     apiFetch("/api/jobs").then(async (res) => {
@@ -50,16 +56,14 @@ export default function Jobs() {
     if (stateFilter.size > 0)
       result = result.filter((j) => stateFilter.has(j.state));
     result = [...result].sort((a, b) =>
-      sortDir === "desc"
-        ? b.runAfter - a.runAfter
-        : a.runAfter - b.runAfter,
+      sortDir === "desc" ? b.runAfter - a.runAfter : a.runAfter - b.runAfter
     );
     return result;
   }, [jobs, typeFilter, stateFilter, sortDir]);
 
   const selected = useMemo(
     () => jobs.find((j) => j.id === selectedId) ?? null,
-    [jobs, selectedId],
+    [jobs, selectedId]
   );
 
   const uniqueTypes = useMemo(() => {
@@ -124,7 +128,7 @@ export default function Jobs() {
                     onClick={() => setSelectedId(job.id)}
                     className={cn(
                       "cursor-pointer border-b border-border hover:bg-accent",
-                      selectedId === job.id && "bg-accent",
+                      selectedId === job.id && "bg-accent"
                     )}
                   >
                     <td className="px-3 py-2">{job.type}</td>
@@ -143,6 +147,8 @@ export default function Jobs() {
                             "border-blue-700 bg-blue-100 text-blue-800",
                           job.state === "pending" &&
                             "border-muted-foreground bg-muted text-muted-foreground",
+                          job.state === "cancelled" &&
+                            "border-orange-700 bg-orange-100 text-orange-800"
                         )}
                       >
                         {job.state}
@@ -167,8 +173,22 @@ export default function Jobs() {
 
         {/* Right pane — detail */}
         <div className="flex w-1/2 flex-col gap-2">
-          {selected ? (
+          {selected ?
             <>
+              {selected.state === "pending" && (
+                <Button
+                  onPress={async () => {
+                    const res = await apiFetch(
+                      `/api/jobs/${selected.id}/cancel`,
+                      { method: "POST" }
+                    );
+                    if (res.ok) refreshJobs();
+                  }}
+                  className="ml-auto cursor-pointer self-start border border-foreground bg-primary px-2 py-1 text-xs font-medium text-primary-foreground shadow-xs hover:bg-primary/90 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none"
+                >
+                  Cancel Job
+                </Button>
+              )}
               <div className="flex flex-1 flex-col gap-1">
                 <label className="text-sm font-medium text-foreground">
                   Payload
@@ -186,19 +206,18 @@ export default function Jobs() {
                 <textarea
                   readOnly
                   value={
-                    selected.output
-                      ? JSON.stringify(selected.output, null, 2)
-                      : ""
+                    selected.output ?
+                      JSON.stringify(selected.output, null, 2)
+                    : ""
                   }
                   className="flex-1 resize-none border border-input bg-background p-3 font-mono text-sm text-foreground outline-none"
                 />
               </div>
             </>
-          ) : (
-            <div className="flex flex-1 items-center justify-center border border-border text-muted-foreground">
+          : <div className="flex flex-1 items-center justify-center border border-border text-muted-foreground">
               Select a job to view details
             </div>
-          )}
+          }
         </div>
       </div>
     </div>

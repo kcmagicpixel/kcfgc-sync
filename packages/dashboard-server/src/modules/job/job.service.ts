@@ -9,6 +9,10 @@ export class JobService {
     return this.repo.listJobs();
   }
 
+  async cancelJob(id: number): Promise<boolean> {
+    return this.repo.cancelJob(id);
+  }
+
   async createJob(
     type: string,
     payload: unknown,

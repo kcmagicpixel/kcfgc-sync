@@ -45,5 +45,6 @@ export const JOB_STATES = [
   "running",
   "completed",
   "failed",
+  "cancelled",
 ] as const;
 export type JobState = (typeof JOB_STATES)[number];
