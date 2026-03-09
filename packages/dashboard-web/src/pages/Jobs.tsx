@@ -4,6 +4,8 @@ import { Button } from "react-aria-components";
 import { useApi } from "../libs/hooks/use-api.hook";
 import { cn } from "../libs/utils/cn.util";
 import { MultiSelect } from "../components/MultiSelect";
+import { Drawer } from "../components/Drawer";
+import { useIsMobile } from "../libs/hooks/use-is-mobile.hook";
 import {
   JOB_STATES,
   JOB_TYPE_KEYS,
@@ -25,6 +27,7 @@ type SortDir = "desc" | "asc";
 
 export default function Jobs() {
   const apiFetch = useApi();
+  const isMobile = useIsMobile();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [typeFilter, setTypeFilter] = useState<Set<string>>(new Set());
@@ -71,6 +74,42 @@ export default function Jobs() {
     return [...new Set([...JOB_TYPE_KEYS, ...fromJobs])].sort();
   }, [jobs]);
 
+  const detailContent = selected && (
+    <>
+      {selected.state === "pending" && (
+        <Button
+          onPress={async () => {
+            const res = await apiFetch(`/api/jobs/${selected.id}/cancel`, {
+              method: "POST",
+            });
+            if (res.ok) refreshJobs();
+          }}
+          className="ml-auto cursor-pointer self-start border border-foreground bg-primary px-2 py-1 text-xs font-medium text-primary-foreground shadow-xs hover:bg-primary/90 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none"
+        >
+          Cancel Job
+        </Button>
+      )}
+      <div className="flex flex-1 flex-col gap-1">
+        <label className="text-sm font-medium text-foreground">Payload</label>
+        <textarea
+          readOnly
+          value={JSON.stringify(selected.payload, null, 2)}
+          className="min-h-48 flex-1 resize-none border border-input bg-background p-3 font-mono text-sm text-foreground outline-none"
+        />
+      </div>
+      <div className="flex flex-1 flex-col gap-1">
+        <label className="text-sm font-medium text-foreground">Output</label>
+        <textarea
+          readOnly
+          value={
+            selected.output ? JSON.stringify(selected.output, null, 2) : ""
+          }
+          className="min-h-48 flex-1 resize-none border border-input bg-background p-3 font-mono text-sm text-foreground outline-none"
+        />
+      </div>
+    </>
+  );
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
@@ -85,7 +124,7 @@ export default function Jobs() {
 
       <div className="flex gap-4" style={{ height: "calc(100vh - 10rem)" }}>
         {/* Left pane — table */}
-        <div className="flex w-1/2 flex-col gap-2">
+        <div className="flex w-full md:w-1/2 flex-col gap-2">
           <div className="flex gap-2">
             <MultiSelect
               label="Type"
@@ -171,55 +210,25 @@ export default function Jobs() {
           </div>
         </div>
 
-        {/* Right pane — detail */}
-        <div className="flex w-1/2 flex-col gap-2">
-          {selected ?
-            <>
-              {selected.state === "pending" && (
-                <Button
-                  onPress={async () => {
-                    const res = await apiFetch(
-                      `/api/jobs/${selected.id}/cancel`,
-                      { method: "POST" }
-                    );
-                    if (res.ok) refreshJobs();
-                  }}
-                  className="ml-auto cursor-pointer self-start border border-foreground bg-primary px-2 py-1 text-xs font-medium text-primary-foreground shadow-xs hover:bg-primary/90 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none"
-                >
-                  Cancel Job
-                </Button>
-              )}
-              <div className="flex flex-1 flex-col gap-1">
-                <label className="text-sm font-medium text-foreground">
-                  Payload
-                </label>
-                <textarea
-                  readOnly
-                  value={JSON.stringify(selected.payload, null, 2)}
-                  className="flex-1 resize-none border border-input bg-background p-3 font-mono text-sm text-foreground outline-none"
-                />
+        {/* Right pane — detail (desktop) */}
+        {!isMobile && (
+          <div className="flex w-1/2 flex-col gap-2">
+            {selected ?
+              detailContent
+            : <div className="flex flex-1 items-center justify-center border border-border text-muted-foreground">
+                Select a job to view details
               </div>
-              <div className="flex flex-1 flex-col gap-1">
-                <label className="text-sm font-medium text-foreground">
-                  Output
-                </label>
-                <textarea
-                  readOnly
-                  value={
-                    selected.output ?
-                      JSON.stringify(selected.output, null, 2)
-                    : ""
-                  }
-                  className="flex-1 resize-none border border-input bg-background p-3 font-mono text-sm text-foreground outline-none"
-                />
-              </div>
-            </>
-          : <div className="flex flex-1 items-center justify-center border border-border text-muted-foreground">
-              Select a job to view details
-            </div>
-          }
-        </div>
+            }
+          </div>
+        )}
       </div>
+
+      {/* Drawer — detail (mobile) */}
+      {isMobile && (
+        <Drawer open={selected != null} onClose={() => setSelectedId(null)}>
+          <div className="flex flex-col gap-2">{detailContent}</div>
+        </Drawer>
+      )}
     </div>
   );
 }

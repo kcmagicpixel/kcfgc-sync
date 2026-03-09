@@ -5,17 +5,21 @@ export function useApi() {
   const navigate = useNavigate();
   const location = useLocation();
   const pathnameRef = useRef(location.pathname);
+  // eslint-disable-next-line react-hooks/refs
   pathnameRef.current = location.pathname;
 
   const apiFetch = useCallback(
     async (input: string | URL | Request, init?: RequestInit) => {
       const res = await fetch(input, init);
       if (res.status === 401) {
-        navigate("/login", { state: { from: pathnameRef.current }, replace: true });
+        navigate("/login", {
+          state: { from: pathnameRef.current },
+          replace: true,
+        });
       }
       return res;
     },
-    [navigate],
+    [navigate]
   );
 
   return apiFetch;

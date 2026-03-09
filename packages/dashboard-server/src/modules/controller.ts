@@ -1,5 +1,4 @@
 import type { Ctor } from "#utils/ctor.type.js";
-import type { Client } from "@libsql/client";
 import type { Application } from "express";
 import { AuthController } from "./auth/auth.controller.js";
 import type { Controller } from "./controller.model.js";

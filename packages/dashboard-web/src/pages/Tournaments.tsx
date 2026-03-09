@@ -3,6 +3,8 @@ import { useNavigate } from "react-router";
 import { Button } from "react-aria-components";
 import { useApi } from "../libs/hooks/use-api.hook";
 import { cn } from "../libs/utils/cn.util";
+import { Drawer } from "../components/Drawer";
+import { useIsMobile } from "../libs/hooks/use-is-mobile.hook";
 
 interface TournamentData {
   name: string;
@@ -23,7 +25,11 @@ interface TournamentData {
     startDate: string;
     isPublished: boolean;
     game: { name: string };
-    standings?: { placement: number; player?: { name: string; prefix?: string }; entrant?: { name: string } }[];
+    standings?: {
+      placement: number;
+      player?: { name: string; prefix?: string };
+      entrant?: { name: string };
+    }[];
     brackets: { type: string; url: string }[];
   }[];
 }
@@ -56,11 +62,25 @@ function FormattedView({ data }: { data: TournamentData }) {
       <div className="flex flex-wrap gap-x-6 gap-y-1">
         <div>
           <span className="font-medium">Start:</span>{" "}
-          {new Date(data.startDate).toLocaleString(undefined, { year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "short" })}
+          {new Date(data.startDate).toLocaleString(undefined, {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "numeric",
+            minute: "2-digit",
+            timeZoneName: "short",
+          })}
         </div>
         <div>
           <span className="font-medium">End:</span>{" "}
-          {new Date(data.endDate).toLocaleString(undefined, { year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "short" })}
+          {new Date(data.endDate).toLocaleString(undefined, {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "numeric",
+            minute: "2-digit",
+            timeZoneName: "short",
+          })}
         </div>
         {data.venueName && (
           <div>
@@ -74,8 +94,7 @@ function FormattedView({ data }: { data: TournamentData }) {
         )}
         {data.attendeeCount != null && (
           <div>
-            <span className="font-medium">Attendees:</span>{" "}
-            {data.attendeeCount}
+            <span className="font-medium">Attendees:</span> {data.attendeeCount}
           </div>
         )}
       </div>
@@ -84,9 +103,9 @@ function FormattedView({ data }: { data: TournamentData }) {
         <span
           className={cn(
             "inline-block border px-1.5 py-0.5 text-xs font-medium",
-            data.isPublished
-              ? "border-green-700 bg-green-100 text-green-800"
-              : "border-muted-foreground bg-muted text-muted-foreground",
+            data.isPublished ?
+              "border-green-700 bg-green-100 text-green-800"
+            : "border-muted-foreground bg-muted text-muted-foreground"
           )}
         >
           {data.isPublished ? "Published" : "Unpublished"}
@@ -94,12 +113,14 @@ function FormattedView({ data }: { data: TournamentData }) {
         <span
           className={cn(
             "inline-block border px-1.5 py-0.5 text-xs font-medium",
-            data.isRegistrationOpen
-              ? "border-blue-700 bg-blue-100 text-blue-800"
-              : "border-muted-foreground bg-muted text-muted-foreground",
+            data.isRegistrationOpen ?
+              "border-blue-700 bg-blue-100 text-blue-800"
+            : "border-muted-foreground bg-muted text-muted-foreground"
           )}
         >
-          {data.isRegistrationOpen ? "Registration Open" : "Registration Closed"}
+          {data.isRegistrationOpen ?
+            "Registration Open"
+          : "Registration Closed"}
         </span>
       </div>
 
@@ -112,10 +133,7 @@ function FormattedView({ data }: { data: TournamentData }) {
             {data.events
               .filter((e) => e.isPublished)
               .map((event, i) => (
-                <div
-                  key={i}
-                  className="border border-border p-2"
-                >
+                <div key={i} className="border border-border p-2">
                   <div className="flex items-baseline justify-between">
                     <span className="font-medium">{event.name}</span>
                     <span className="text-xs text-muted-foreground">
@@ -132,9 +150,9 @@ function FormattedView({ data }: { data: TournamentData }) {
                       {event.standings.map((s) => (
                         <div key={s.placement}>
                           #{s.placement}{" "}
-                          {s.player
-                            ? `${s.player.prefix ? `${s.player.prefix} | ` : ""}${s.player.name}`
-                            : s.entrant?.name ?? "Unknown"}
+                          {s.player ?
+                            `${s.player.prefix ? `${s.player.prefix} | ` : ""}${s.player.name}`
+                          : (s.entrant?.name ?? "Unknown")}
                         </div>
                       ))}
                     </div>
@@ -160,6 +178,7 @@ function FormattedView({ data }: { data: TournamentData }) {
 export default function Tournaments() {
   const apiFetch = useApi();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
@@ -187,7 +206,7 @@ export default function Tournaments() {
 
   const selected = useMemo(
     () => tournaments.find((t) => t.key === selectedKey) ?? null,
-    [tournaments, selectedKey],
+    [tournaments, selectedKey]
   );
 
   return (
@@ -196,7 +215,7 @@ export default function Tournaments() {
 
       <div className="flex gap-4" style={{ height: "calc(100vh - 10rem)" }}>
         {/* Left pane — table */}
-        <div className="flex w-1/2 flex-col gap-2">
+        <div className="flex w-full md:w-1/2 flex-col gap-2">
           <div className="flex-1 overflow-y-auto border border-foreground">
             <table className="w-full text-sm">
               <thead className="sticky top-0 bg-card">
@@ -222,7 +241,7 @@ export default function Tournaments() {
                     onClick={() => setSelectedKey(t.key)}
                     className={cn(
                       "cursor-pointer border-b border-border hover:bg-accent",
-                      selectedKey === t.key && "bg-accent",
+                      selectedKey === t.key && "bg-accent"
                     )}
                   >
                     <td className="px-3 py-2">{t.key}</td>
@@ -230,9 +249,9 @@ export default function Tournaments() {
                       {new Date(t.data.startDate).toLocaleDateString()}
                     </td>
                     <td className="px-3 py-2">
-                      {t.updatedAt
-                        ? new Date(t.updatedAt).toLocaleString()
-                        : "\u2014"}
+                      {t.updatedAt ?
+                        new Date(t.updatedAt).toLocaleString()
+                      : "\u2014"}
                     </td>
                   </tr>
                 ))}
@@ -251,66 +270,80 @@ export default function Tournaments() {
           </div>
         </div>
 
-        {/* Right pane — detail */}
-        <div className="flex w-1/2 flex-col gap-2">
-          {selected ? (
-            <>
-              <div className="flex gap-1">
-                <Button
-                  onPress={() => setViewMode("formatted")}
-                  className={cn(
-                    "cursor-pointer border border-foreground px-2 py-1 text-xs font-medium",
-                    viewMode === "formatted"
-                      ? "bg-foreground text-background"
-                      : "bg-background text-foreground",
-                  )}
-                >
-                  Formatted
-                </Button>
-                <Button
-                  onPress={() => setViewMode("raw")}
-                  className={cn(
-                    "cursor-pointer border border-foreground px-2 py-1 text-xs font-medium",
-                    viewMode === "raw"
-                      ? "bg-foreground text-background"
-                      : "bg-background text-foreground",
-                  )}
-                >
-                  Raw JSON
-                </Button>
-                <Button
-                  onPress={async () => {
-                    const res = await apiFetch(
-                      `/api/tournaments/${selected.key}/draft-post`,
-                    );
-                    if (res.ok) {
-                      navigate("/posts/new", { state: await res.json() });
-                    }
-                  }}
-                  className="ml-auto cursor-pointer border border-foreground bg-primary px-2 py-1 text-xs font-medium text-primary-foreground shadow-xs hover:bg-primary/90 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none"
-                >
-                  Draft Post
-                </Button>
+        {/* Right pane — detail (desktop) */}
+        {!isMobile && (
+          <div className="flex w-1/2 flex-col gap-2">
+            {selected ?
+              <DetailPane />
+            : <div className="flex flex-1 items-center justify-center border border-border text-muted-foreground">
+                Select a tournament to view details
               </div>
-              <div className="min-h-0 flex-1 overflow-y-auto border border-input">
-                {viewMode === "formatted" ? (
-                  <FormattedView data={selected.data} />
-                ) : (
-                  <textarea
-                    readOnly
-                    value={JSON.stringify(selected.data, null, 2)}
-                    className="h-full w-full resize-none bg-background p-3 font-mono text-sm text-foreground outline-none"
-                  />
-                )}
-              </div>
-            </>
-          ) : (
-            <div className="flex flex-1 items-center justify-center border border-border text-muted-foreground">
-              Select a tournament to view details
-            </div>
-          )}
-        </div>
+            }
+          </div>
+        )}
       </div>
+
+      {/* Drawer — detail (mobile) */}
+      {isMobile && (
+        <Drawer open={selected != null} onClose={() => setSelectedKey(null)}>
+          {selected && <DetailPane />}
+        </Drawer>
+      )}
     </div>
   );
+
+  function DetailPane() {
+    if (!selected) return null;
+    return (
+      <>
+        <div className="flex flex-wrap gap-1">
+          <Button
+            onPress={() => setViewMode("formatted")}
+            className={cn(
+              "cursor-pointer border border-foreground px-2 py-1 text-xs font-medium",
+              viewMode === "formatted" ?
+                "bg-foreground text-background"
+              : "bg-background text-foreground"
+            )}
+          >
+            Formatted
+          </Button>
+          <Button
+            onPress={() => setViewMode("raw")}
+            className={cn(
+              "cursor-pointer border border-foreground px-2 py-1 text-xs font-medium",
+              viewMode === "raw" ?
+                "bg-foreground text-background"
+              : "bg-background text-foreground"
+            )}
+          >
+            Raw JSON
+          </Button>
+          <Button
+            onPress={async () => {
+              const res = await apiFetch(
+                `/api/tournaments/${selected.key}/draft-post`
+              );
+              if (res.ok) {
+                navigate("/posts/new", { state: await res.json() });
+              }
+            }}
+            className="ml-auto cursor-pointer border border-foreground bg-primary px-2 py-1 text-xs font-medium text-primary-foreground shadow-xs hover:bg-primary/90 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none"
+          >
+            Draft Post
+          </Button>
+        </div>
+        <div className="min-h-0 flex-1 overflow-y-auto border border-input">
+          {viewMode === "formatted" ?
+            <FormattedView data={selected.data} />
+          : <textarea
+              readOnly
+              value={JSON.stringify(selected.data, null, 2)}
+              className="h-full min-h-64 w-full resize-none bg-background p-3 font-mono text-sm text-foreground outline-none"
+            />
+          }
+        </div>
+      </>
+    );
+  }
 }

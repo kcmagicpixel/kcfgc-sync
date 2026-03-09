@@ -266,7 +266,6 @@ describe("Post", () => {
 
     it("createPost creates jobs with correct unique keys", async () => {
       const jobRepo = Container.getInstance(JobRepository);
-      const postRepo = Container.getInstance(PostRepository);
 
       // Inline the service logic to avoid importing providers
       const providers = ["bluesky", "twitter"];

@@ -1,6 +1,12 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate, useLocation } from "react-router";
-import { Button, Input, Label, TextField, Checkbox } from "react-aria-components";
+import {
+  Button,
+  Input,
+  Label,
+  TextField,
+  Checkbox,
+} from "react-aria-components";
 import { useApi } from "../libs/hooks/use-api.hook";
 import { cn } from "../libs/utils/cn.util";
 import { resizeImage } from "../libs/utils/resize-image.util";
@@ -34,15 +40,17 @@ export default function PostCreate() {
 
   const [providers, setProviders] = useState<ProviderInfo[]>([]);
   const [selectedProviders, setSelectedProviders] = useState<Set<string>>(
-    new Set(),
+    new Set()
   );
   const [text, setText] = useState(draft?.text ?? "");
   const [key, setKey] = useState(draft?.key ?? "");
   const [runAfter, setRunAfter] = useState(() =>
-    draft?.runAfter ? toDatetimeLocal(draft.runAfter) : toDatetimeLocal(Date.now()),
+    draft?.runAfter ?
+      toDatetimeLocal(draft.runAfter)
+    : toDatetimeLocal(Date.now())
   );
   const [attachmentMode, setAttachmentMode] = useState<AttachmentMode>(
-    draft?.embed ? "embed" : "none",
+    draft?.embed ? "embed" : "none"
   );
   const [files, setFiles] = useState<File[]>([]);
   const [embedUrl, setEmbedUrl] = useState(draft?.embed?.url ?? "");
@@ -122,8 +130,10 @@ export default function PostCreate() {
 
     setSubmitting(true);
     try {
-      let imageIds: number[] = [];
-      let embed: { url: string; title: string; description?: string; imageId?: number } | undefined;
+      const imageIds: number[] = [];
+      let embed:
+        | { url: string; title: string; description?: string; imageId?: number }
+        | undefined;
 
       if (attachmentMode === "images") {
         // Upload images
@@ -149,7 +159,11 @@ export default function PostCreate() {
         };
         // Upload embed thumbnail if present
         if (embedImage) {
-          const { base64, mimeType } = await resizeImage(embedImage, 1_000_000, 2000);
+          const { base64, mimeType } = await resizeImage(
+            embedImage,
+            1_000_000,
+            2000
+          );
           const res = await apiFetch("/api/posts/images", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -212,14 +226,14 @@ export default function PostCreate() {
                 onChange={() => toggleProvider(p.name)}
                 className={cn(
                   "flex items-center gap-1.5 text-sm",
-                  !p.enabled && "opacity-50",
+                  !p.enabled && "opacity-50"
                 )}
               >
                 <div
                   className={cn(
                     "flex h-4 w-4 items-center justify-center border border-input",
                     selectedProviders.has(p.name) &&
-                      "border-primary bg-primary text-primary-foreground",
+                      "border-primary bg-primary text-primary-foreground"
                   )}
                 >
                   {selectedProviders.has(p.name) && (
@@ -262,7 +276,11 @@ export default function PostCreate() {
                   onChange={() => setAttachmentMode(mode)}
                   className="accent-primary"
                 />
-                {mode === "none" ? "None" : mode === "images" ? "Images" : "Embed"}
+                {mode === "none" ?
+                  "None"
+                : mode === "images" ?
+                  "Images"
+                : "Embed"}
               </label>
             ))}
           </div>
@@ -313,7 +331,9 @@ export default function PostCreate() {
               isRequired
               className="flex flex-col gap-1"
             >
-              <Label className="text-sm font-medium text-foreground">Title</Label>
+              <Label className="text-sm font-medium text-foreground">
+                Title
+              </Label>
               <Input className="border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring" />
             </TextField>
 
@@ -340,7 +360,9 @@ export default function PostCreate() {
                 className="text-sm text-foreground"
               />
               {loadingImage && (
-                <span className="text-xs text-muted-foreground">Loading thumbnail...</span>
+                <span className="text-xs text-muted-foreground">
+                  Loading thumbnail...
+                </span>
               )}
               {embedImage && (
                 <img
@@ -363,7 +385,9 @@ export default function PostCreate() {
             Unique Key
           </Label>
           <div className="flex items-center gap-1">
-            <span className="text-sm text-muted-foreground">post-{"{provider}"}-</span>
+            <span className="text-sm text-muted-foreground">
+              post-{"{provider}"}-
+            </span>
             <Input className="flex-1 border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring" />
           </div>
         </TextField>

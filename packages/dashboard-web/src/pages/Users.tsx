@@ -1,8 +1,10 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { Button, Input, Label, TextField } from "react-aria-components";
 import { useApi } from "../libs/hooks/use-api.hook";
 import { useAuth } from "../libs/hooks/use-auth.hook";
 import { cn } from "../libs/utils/cn.util";
+import { Drawer } from "../components/Drawer";
+import { useIsMobile } from "../libs/hooks/use-is-mobile.hook";
 
 interface UserRow {
   id: number;
@@ -19,6 +21,7 @@ export default function Users() {
   const { userId: currentUserId, role } = useAuth();
   const isAdmin = role === "admin";
   const apiFetch = useApi();
+  const isMobile = useIsMobile();
 
   const [users, setUsers] = useState<UserRow[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -38,14 +41,14 @@ export default function Users() {
 
   const selected = users.find((u) => u.id === selectedId) ?? null;
 
-  async function fetchUsers() {
+  const fetchUsers = useCallback(async () => {
     const res = await apiFetch("/api/users");
     if (res.ok) setUsers(await res.json());
-  }
+  }, [apiFetch]);
 
   useEffect(() => {
     fetchUsers();
-  }, [apiFetch]);
+  }, [apiFetch, fetchUsers]);
 
   useEffect(() => {
     if (selectedId == null) {
@@ -172,7 +175,7 @@ export default function Users() {
 
       <div className="flex gap-4" style={{ height: "calc(100vh - 10rem)" }}>
         {/* Left pane — table */}
-        <div className="flex w-1/2 flex-col gap-2">
+        <div className="flex w-full md:w-1/2 flex-col gap-2">
           <div className="flex-1 overflow-y-auto border border-foreground">
             <table className="w-full text-sm">
               <thead className="sticky top-0 bg-card">
@@ -193,7 +196,7 @@ export default function Users() {
                     }}
                     className={cn(
                       "cursor-pointer border-b border-border hover:bg-accent",
-                      selectedId === u.id && "bg-accent",
+                      selectedId === u.id && "bg-accent"
                     )}
                   >
                     <td className="px-3 py-2">{u.username}</td>
@@ -201,9 +204,9 @@ export default function Users() {
                       <span
                         className={cn(
                           "inline-block border px-1.5 py-0.5 text-xs font-medium",
-                          u.role === "admin"
-                            ? "border-blue-700 bg-blue-100 text-blue-800"
-                            : "border-muted-foreground bg-muted text-muted-foreground",
+                          u.role === "admin" ?
+                            "border-blue-700 bg-blue-100 text-blue-800"
+                          : "border-muted-foreground bg-muted text-muted-foreground"
                         )}
                       >
                         {u.role}
@@ -226,119 +229,132 @@ export default function Users() {
           </div>
         </div>
 
-        {/* Right pane — detail */}
-        <div className="flex w-1/2 flex-col gap-2">
-          {selected ? (
-            <div className="min-h-0 flex-1 overflow-y-auto border border-input p-4">
-              <div className="flex flex-col gap-4">
-                <div>
-                  <h2 className="text-lg font-bold">{selected.username}</h2>
-                  <span
-                    className={cn(
-                      "inline-block border px-1.5 py-0.5 text-xs font-medium",
-                      selected.role === "admin"
-                        ? "border-blue-700 bg-blue-100 text-blue-800"
-                        : "border-muted-foreground bg-muted text-muted-foreground",
-                    )}
-                  >
-                    {selected.role}
-                  </span>
-                </div>
-
-                {canChangePassword && (
-                  <form
-                    onSubmit={handleChangePassword}
-                    className="flex flex-col gap-2"
-                  >
-                    <h3 className="text-sm font-medium text-foreground">
-                      Change Password
-                    </h3>
-                    <div className="flex items-end gap-2">
-                      <TextField
-                        value={password}
-                        onChange={(v) => {
-                          setPassword(v);
-                          setPasswordSuccess(false);
-                        }}
-                        type="password"
-                        className="flex flex-1 flex-col gap-1"
-                      >
-                        <Label className="text-sm font-medium text-foreground">
-                          New Password
-                        </Label>
-                        <Input className="border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring" />
-                      </TextField>
-                      <Button
-                        type="submit"
-                        isDisabled={savingPassword}
-                        className="cursor-pointer border border-foreground bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-xs hover:bg-primary/90 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none disabled:opacity-50"
-                      >
-                        {savingPassword ? "Saving..." : "Update"}
-                      </Button>
-                    </div>
-                    {passwordError && (
-                      <span className="text-sm text-destructive">
-                        {passwordError}
-                      </span>
-                    )}
-                    {passwordSuccess && (
-                      <span className="text-sm text-green-700">
-                        Password updated
-                      </span>
-                    )}
-                  </form>
-                )}
-
-                {isAdmin &&
-                  selected.id !== currentUserId && (
-                    <div>
-                      <Button
-                        onPress={handleDelete}
-                        className="cursor-pointer border border-destructive bg-destructive/10 px-4 py-2 text-sm font-medium text-destructive shadow-xs hover:bg-destructive/20 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none"
-                      >
-                        Delete User
-                      </Button>
-                    </div>
-                  )}
-
-                <div>
-                  <h3 className="mb-1 text-sm font-medium text-foreground">
-                    Active Sessions ({sessions.length})
-                  </h3>
-                  {sessions.length > 0 ? (
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b border-border text-left">
-                          <th className="px-2 py-1 font-medium">ID</th>
-                          <th className="px-2 py-1 font-medium">Created</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {sessions.map((s) => (
-                          <tr key={s.id} className="border-b border-border">
-                            <td className="px-2 py-1">{s.id}</td>
-                            <td className="px-2 py-1">
-                              {new Date(s.createdAt).toLocaleString()}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      No active sessions
-                    </p>
-                  )}
-                </div>
+        {/* Right pane — detail (desktop) */}
+        {!isMobile && (
+          <div className="flex w-1/2 flex-col gap-2">
+            {selected ?
+              <DetailPane />
+            : <div className="flex flex-1 items-center justify-center border border-border text-muted-foreground">
+                Select a user to view details
               </div>
-            </div>
-          ) : (
-            <div className="flex flex-1 items-center justify-center border border-border text-muted-foreground">
-              Select a user to view details
-            </div>
-          )}
-        </div>
+            }
+          </div>
+        )}
       </div>
+
+      {/* Drawer — detail (mobile) */}
+      {isMobile && (
+        <Drawer open={selected != null} onClose={() => setSelectedId(null)}>
+          {selected && <DetailPane />}
+        </Drawer>
+      )}
     </div>
   );
+
+  function DetailPane() {
+    if (!selected) return null;
+    return (
+      <div className="min-h-0 flex-1 overflow-y-auto border border-input p-4 md:border">
+        <div className="flex flex-col gap-4">
+          <div>
+            <h2 className="text-lg font-bold">{selected.username}</h2>
+            <span
+              className={cn(
+                "inline-block border px-1.5 py-0.5 text-xs font-medium",
+                selected.role === "admin" ?
+                  "border-blue-700 bg-blue-100 text-blue-800"
+                : "border-muted-foreground bg-muted text-muted-foreground"
+              )}
+            >
+              {selected.role}
+            </span>
+          </div>
+
+          {canChangePassword && (
+            <form
+              onSubmit={handleChangePassword}
+              className="flex flex-col gap-2"
+            >
+              <h3 className="text-sm font-medium text-foreground">
+                Change Password
+              </h3>
+              <div className="flex items-end gap-2">
+                <TextField
+                  value={password}
+                  onChange={(v) => {
+                    setPassword(v);
+                    setPasswordSuccess(false);
+                  }}
+                  type="password"
+                  className="flex flex-1 flex-col gap-1"
+                >
+                  <Label className="text-sm font-medium text-foreground">
+                    New Password
+                  </Label>
+                  <Input className="border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring" />
+                </TextField>
+                <Button
+                  type="submit"
+                  isDisabled={savingPassword}
+                  className="cursor-pointer border border-foreground bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-xs hover:bg-primary/90 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none disabled:opacity-50"
+                >
+                  {savingPassword ? "Saving..." : "Update"}
+                </Button>
+              </div>
+              {passwordError && (
+                <span className="text-sm text-destructive">
+                  {passwordError}
+                </span>
+              )}
+              {passwordSuccess && (
+                <span className="text-sm text-green-700">Password updated</span>
+              )}
+            </form>
+          )}
+
+          {isAdmin && selected.id !== currentUserId && (
+            <div>
+              <Button
+                onPress={handleDelete}
+                className="cursor-pointer border border-destructive bg-destructive/10 px-4 py-2 text-sm font-medium text-destructive shadow-xs hover:bg-destructive/20 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none"
+              >
+                Delete User
+              </Button>
+            </div>
+          )}
+
+          <div>
+            <h3 className="mb-1 text-sm font-medium text-foreground">
+              Active Sessions ({sessions.length})
+            </h3>
+            {sessions.length > 0 ?
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border text-left">
+                      <th className="px-2 py-1 font-medium">ID</th>
+                      <th className="px-2 py-1 font-medium">Created</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sessions.map((s) => (
+                      <tr key={s.id} className="border-b border-border">
+                        <td className="px-2 py-1">{s.id}</td>
+                        <td className="px-2 py-1">
+                          {new Date(s.createdAt).toLocaleString()}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            : <p className="text-sm text-muted-foreground">
+                No active sessions
+              </p>
+            }
+          </div>
+        </div>
+      </div>
+    );
+  }
 }
