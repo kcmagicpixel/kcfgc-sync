@@ -175,6 +175,65 @@ function FormattedView({ data }: { data: TournamentData }) {
   );
 }
 
+interface TournamentDetailPaneProps {
+  selected: Tournament;
+  viewMode: "formatted" | "raw";
+  onViewModeChange: (v: "formatted" | "raw") => void;
+  onDraftPost: () => void;
+}
+
+function TournamentDetailPane({
+  selected,
+  viewMode,
+  onViewModeChange,
+  onDraftPost,
+}: TournamentDetailPaneProps) {
+  return (
+    <>
+      <div className="flex flex-wrap gap-1">
+        <Button
+          onPress={() => onViewModeChange("formatted")}
+          className={cn(
+            "cursor-pointer border border-foreground px-2 py-1 text-xs font-medium",
+            viewMode === "formatted" ?
+              "bg-foreground text-background"
+            : "bg-background text-foreground"
+          )}
+        >
+          Formatted
+        </Button>
+        <Button
+          onPress={() => onViewModeChange("raw")}
+          className={cn(
+            "cursor-pointer border border-foreground px-2 py-1 text-xs font-medium",
+            viewMode === "raw" ?
+              "bg-foreground text-background"
+            : "bg-background text-foreground"
+          )}
+        >
+          Raw JSON
+        </Button>
+        <Button
+          onPress={onDraftPost}
+          className="ml-auto cursor-pointer border border-foreground bg-primary px-2 py-1 text-xs font-medium text-primary-foreground shadow-xs hover:bg-primary/90 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none"
+        >
+          Draft Post
+        </Button>
+      </div>
+      <div className="min-h-0 flex-1 overflow-y-auto border border-input">
+        {viewMode === "formatted" ?
+          <FormattedView data={selected.data} />
+        : <textarea
+            readOnly
+            value={JSON.stringify(selected.data, null, 2)}
+            className="h-full min-h-64 w-full resize-none bg-background p-3 font-mono text-sm text-foreground outline-none"
+          />
+        }
+      </div>
+    </>
+  );
+}
+
 export default function Tournaments() {
   const apiFetch = useApi();
   const navigate = useNavigate();
@@ -208,6 +267,26 @@ export default function Tournaments() {
     () => tournaments.find((t) => t.key === selectedKey) ?? null,
     [tournaments, selectedKey]
   );
+
+  async function handleDraftPost() {
+    if (!selected) return;
+    const res = await apiFetch(`/api/tournaments/${selected.key}/draft-post`);
+    if (res.ok) {
+      navigate("/posts/new", { state: await res.json() });
+    }
+  }
+
+  const paneContent =
+    selected ?
+      <TournamentDetailPane
+        selected={selected}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        onDraftPost={handleDraftPost}
+      />
+    : <div className="flex flex-1 items-center justify-center border border-border text-muted-foreground">
+        Select a tournament to view details
+      </div>;
 
   return (
     <div className="flex flex-col gap-4">
@@ -270,77 +349,15 @@ export default function Tournaments() {
         </div>
 
         {!isMobile && (
-          <div className="flex w-1/2 flex-col gap-2">
-            {selected ?
-              <DetailPane />
-            : <div className="flex flex-1 items-center justify-center border border-border text-muted-foreground">
-                Select a tournament to view details
-              </div>
-            }
-          </div>
+          <div className="flex w-1/2 flex-col gap-2">{paneContent}</div>
         )}
       </div>
 
       {isMobile && (
         <Drawer open={selected != null} onClose={() => setSelectedKey(null)}>
-          {selected && <DetailPane />}
+          {paneContent}
         </Drawer>
       )}
     </div>
   );
-
-  function DetailPane() {
-    if (!selected) return null;
-    return (
-      <>
-        <div className="flex flex-wrap gap-1">
-          <Button
-            onPress={() => setViewMode("formatted")}
-            className={cn(
-              "cursor-pointer border border-foreground px-2 py-1 text-xs font-medium",
-              viewMode === "formatted" ?
-                "bg-foreground text-background"
-              : "bg-background text-foreground"
-            )}
-          >
-            Formatted
-          </Button>
-          <Button
-            onPress={() => setViewMode("raw")}
-            className={cn(
-              "cursor-pointer border border-foreground px-2 py-1 text-xs font-medium",
-              viewMode === "raw" ?
-                "bg-foreground text-background"
-              : "bg-background text-foreground"
-            )}
-          >
-            Raw JSON
-          </Button>
-          <Button
-            onPress={async () => {
-              const res = await apiFetch(
-                `/api/tournaments/${selected.key}/draft-post`
-              );
-              if (res.ok) {
-                navigate("/posts/new", { state: await res.json() });
-              }
-            }}
-            className="ml-auto cursor-pointer border border-foreground bg-primary px-2 py-1 text-xs font-medium text-primary-foreground shadow-xs hover:bg-primary/90 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none"
-          >
-            Draft Post
-          </Button>
-        </div>
-        <div className="min-h-0 flex-1 overflow-y-auto border border-input">
-          {viewMode === "formatted" ?
-            <FormattedView data={selected.data} />
-          : <textarea
-              readOnly
-              value={JSON.stringify(selected.data, null, 2)}
-              className="h-full min-h-64 w-full resize-none bg-background p-3 font-mono text-sm text-foreground outline-none"
-            />
-          }
-        </div>
-      </>
-    );
-  }
 }

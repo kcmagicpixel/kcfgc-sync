@@ -22,6 +22,166 @@ interface Replacement {
 
 type Mode = "view" | "edit" | "create";
 
+interface ReplacementDetailPaneProps {
+  mode: Mode;
+  selected: Replacement | null;
+  providerNames: string[];
+  formInput: string;
+  onFormInputChange: (v: string) => void;
+  formOutput: Record<string, string>;
+  onFormOutputChange: React.Dispatch<
+    React.SetStateAction<Record<string, string>>
+  >;
+  saving: boolean;
+  deleting: boolean;
+  onSave: () => void;
+  onDelete: () => void | Promise<void>;
+  onStartEdit: () => void;
+  onCancel: () => void;
+}
+
+function ReplacementDetailPane({
+  mode,
+  selected,
+  providerNames,
+  formInput,
+  onFormInputChange,
+  formOutput,
+  onFormOutputChange,
+  saving,
+  deleting,
+  onSave,
+  onDelete,
+  onStartEdit,
+  onCancel,
+}: ReplacementDetailPaneProps) {
+  if (mode === "view" && selected) {
+    return (
+      <div className="min-h-0 flex-1 overflow-y-auto border border-input p-4 md:border">
+        <div className="flex flex-col gap-4 text-sm">
+          <div>
+            <span className="font-medium">Input:</span>{" "}
+            <code className="bg-muted px-1 py-0.5">{selected.input}</code>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <span className="font-medium">Output per provider:</span>
+            {providerNames.map((name) => (
+              <div key={name} className="flex gap-2">
+                <span className="w-20 text-muted-foreground">{name}:</span>
+                <span className="font-mono">
+                  {selected.output[name] ?? (
+                    <span className="text-muted-foreground italic">
+                      (no replacement)
+                    </span>
+                  )}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <div>
+            <span className="font-medium">Created:</span>{" "}
+            {new Date(selected.createdAt).toLocaleString()}
+          </div>
+          <div>
+            <span className="font-medium">Updated:</span>{" "}
+            {new Date(selected.updatedAt).toLocaleString()}
+          </div>
+
+          <div className="flex gap-2">
+            <Button
+              onPress={onStartEdit}
+              className="cursor-pointer border border-foreground bg-background px-3 py-1.5 text-sm font-medium text-foreground shadow-xs hover:bg-accent pressed:translate-x-px pressed:translate-y-px pressed:shadow-none"
+            >
+              Edit
+            </Button>
+            <ConfirmDialog
+              title="Delete Replacement"
+              description="Are you sure you want to delete this replacement?"
+              confirmLabel="Delete"
+              onConfirm={onDelete}
+            >
+              <Button
+                isDisabled={deleting}
+                className="cursor-pointer border border-destructive bg-destructive/10 px-3 py-1.5 text-sm font-medium text-destructive shadow-xs hover:bg-destructive/20 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none disabled:opacity-50"
+              >
+                {deleting ? "Deleting..." : "Delete"}
+              </Button>
+            </ConfirmDialog>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (mode === "create" || mode === "edit") {
+    return (
+      <div className="min-h-0 flex-1 overflow-y-auto border border-input p-4 md:border">
+        <div className="flex flex-col gap-4 text-sm">
+          <h2 className="font-medium">
+            {mode === "create" ? "New Replacement" : "Edit Replacement"}
+          </h2>
+
+          <TextField
+            value={formInput}
+            onChange={onFormInputChange}
+            isRequired
+            className="flex flex-col gap-1"
+          >
+            <Label className="text-sm font-medium text-foreground">
+              Input string
+            </Label>
+            <Input className="border border-input bg-background px-3 py-2 font-mono text-sm text-foreground outline-none focus:ring-2 focus:ring-ring" />
+          </TextField>
+
+          {providerNames.map((name) => (
+            <TextField
+              key={name}
+              value={formOutput[name] ?? ""}
+              onChange={(v) =>
+                onFormOutputChange((prev) => ({ ...prev, [name]: v }))
+              }
+              className="flex flex-col gap-1"
+            >
+              <Label className="text-sm font-medium text-foreground">
+                {name}
+              </Label>
+              <Input className="border border-input bg-background px-3 py-2 font-mono text-sm text-foreground outline-none focus:ring-2 focus:ring-ring" />
+            </TextField>
+          ))}
+
+          <p className="text-xs text-muted-foreground">
+            Leave a provider field blank to skip replacement for that provider.
+          </p>
+
+          <div className="flex gap-2">
+            <Button
+              onPress={onSave}
+              isDisabled={saving || !formInput.trim()}
+              className="cursor-pointer border border-foreground bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-xs hover:bg-primary/90 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none disabled:opacity-50"
+            >
+              {saving ? "Saving..." : "Save"}
+            </Button>
+            <Button
+              onPress={onCancel}
+              className="cursor-pointer border border-foreground bg-background px-4 py-2 text-sm font-medium text-foreground shadow-xs hover:bg-accent pressed:translate-x-px pressed:translate-y-px pressed:shadow-none"
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-1 items-center justify-center border border-border text-muted-foreground">
+      Select a replacement to view details
+    </div>
+  );
+}
+
 export default function Replacements() {
   const apiFetch = useApi();
   const isMobile = useIsMobile();
@@ -131,6 +291,24 @@ export default function Replacements() {
 
   const providerNames = providers.map((p) => p.name);
 
+  const paneContent = (
+    <ReplacementDetailPane
+      mode={mode}
+      selected={selected}
+      providerNames={providerNames}
+      formInput={formInput}
+      onFormInputChange={setFormInput}
+      formOutput={formOutput}
+      onFormOutputChange={setFormOutput}
+      saving={saving}
+      deleting={deleting}
+      onSave={handleSave}
+      onDelete={handleDelete}
+      onStartEdit={startEdit}
+      onCancel={cancelForm}
+    />
+  );
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
@@ -196,9 +374,7 @@ export default function Replacements() {
         </div>
 
         {!isMobile && (
-          <div className="flex w-1/2 flex-col gap-2">
-            <DetailPane />
-          </div>
+          <div className="flex w-1/2 flex-col gap-2">{paneContent}</div>
         )}
       </div>
 
@@ -214,138 +390,9 @@ export default function Replacements() {
             setMode("view");
           }}
         >
-          <DetailPane />
+          {paneContent}
         </Drawer>
       )}
     </div>
   );
-
-  function DetailPane() {
-    if (mode === "view" && selected) {
-      return (
-        <div className="min-h-0 flex-1 overflow-y-auto border border-input p-4 md:border">
-          <div className="flex flex-col gap-4 text-sm">
-            <div>
-              <span className="font-medium">Input:</span>{" "}
-              <code className="bg-muted px-1 py-0.5">{selected.input}</code>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <span className="font-medium">Output per provider:</span>
-              {providerNames.map((name) => (
-                <div key={name} className="flex gap-2">
-                  <span className="w-20 text-muted-foreground">{name}:</span>
-                  <span className="font-mono">
-                    {selected.output[name] ?? (
-                      <span className="text-muted-foreground italic">
-                        (no replacement)
-                      </span>
-                    )}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            <div>
-              <span className="font-medium">Created:</span>{" "}
-              {new Date(selected.createdAt).toLocaleString()}
-            </div>
-            <div>
-              <span className="font-medium">Updated:</span>{" "}
-              {new Date(selected.updatedAt).toLocaleString()}
-            </div>
-
-            <div className="flex gap-2">
-              <Button
-                onPress={startEdit}
-                className="cursor-pointer border border-foreground bg-background px-3 py-1.5 text-sm font-medium text-foreground shadow-xs hover:bg-accent pressed:translate-x-px pressed:translate-y-px pressed:shadow-none"
-              >
-                Edit
-              </Button>
-              <ConfirmDialog
-                title="Delete Replacement"
-                description="Are you sure you want to delete this replacement?"
-                confirmLabel="Delete"
-                onConfirm={handleDelete}
-              >
-                <Button
-                  isDisabled={deleting}
-                  className="cursor-pointer border border-destructive bg-destructive/10 px-3 py-1.5 text-sm font-medium text-destructive shadow-xs hover:bg-destructive/20 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none disabled:opacity-50"
-                >
-                  {deleting ? "Deleting..." : "Delete"}
-                </Button>
-              </ConfirmDialog>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    if (mode === "create" || mode === "edit") {
-      return (
-        <div className="min-h-0 flex-1 overflow-y-auto border border-input p-4 md:border">
-          <div className="flex flex-col gap-4 text-sm">
-            <h2 className="font-medium">
-              {mode === "create" ? "New Replacement" : "Edit Replacement"}
-            </h2>
-
-            <TextField
-              value={formInput}
-              onChange={setFormInput}
-              isRequired
-              className="flex flex-col gap-1"
-            >
-              <Label className="text-sm font-medium text-foreground">
-                Input string
-              </Label>
-              <Input className="border border-input bg-background px-3 py-2 font-mono text-sm text-foreground outline-none focus:ring-2 focus:ring-ring" />
-            </TextField>
-
-            {providerNames.map((name) => (
-              <TextField
-                key={name}
-                value={formOutput[name] ?? ""}
-                onChange={(v) =>
-                  setFormOutput((prev) => ({ ...prev, [name]: v }))
-                }
-                className="flex flex-col gap-1"
-              >
-                <Label className="text-sm font-medium text-foreground">
-                  {name}
-                </Label>
-                <Input className="border border-input bg-background px-3 py-2 font-mono text-sm text-foreground outline-none focus:ring-2 focus:ring-ring" />
-              </TextField>
-            ))}
-
-            <p className="text-xs text-muted-foreground">
-              Leave a provider field blank to skip replacement for that
-              provider.
-            </p>
-
-            <div className="flex gap-2">
-              <Button
-                onPress={handleSave}
-                isDisabled={saving || !formInput.trim()}
-                className="cursor-pointer border border-foreground bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-xs hover:bg-primary/90 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none disabled:opacity-50"
-              >
-                {saving ? "Saving..." : "Save"}
-              </Button>
-              <Button
-                onPress={cancelForm}
-                className="cursor-pointer border border-foreground bg-background px-4 py-2 text-sm font-medium text-foreground shadow-xs hover:bg-accent pressed:translate-x-px pressed:translate-y-px pressed:shadow-none"
-              >
-                Cancel
-              </Button>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="flex flex-1 items-center justify-center border border-border text-muted-foreground">
-        Select a replacement to view details
-      </div>
-    );
-  }
 }

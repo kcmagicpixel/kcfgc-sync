@@ -7,6 +7,154 @@ import { Drawer } from "../components/Drawer";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { useIsMobile } from "../libs/hooks/use-is-mobile.hook";
 
+interface UserDetailPaneProps {
+  selected: UserRow;
+  isAdmin: boolean;
+  currentUserId: number;
+  canChangePassword: boolean;
+  canManageSessions: boolean;
+  password: string;
+  onPasswordChange: (v: string) => void;
+  passwordError: string | null;
+  passwordSuccess: boolean;
+  savingPassword: boolean;
+  onChangePassword: (e: FormEvent) => void;
+  onDelete: () => void;
+  sessions: SessionRow[];
+  onDeleteSession: (sessionId: number) => void;
+}
+
+function UserDetailPane({
+  selected,
+  isAdmin,
+  currentUserId,
+  canChangePassword,
+  canManageSessions,
+  password,
+  onPasswordChange,
+  passwordError,
+  passwordSuccess,
+  savingPassword,
+  onChangePassword,
+  onDelete,
+  sessions,
+  onDeleteSession,
+}: UserDetailPaneProps) {
+  return (
+    <div className="min-h-0 flex-1 overflow-y-auto border border-input p-4 md:border">
+      <div className="flex flex-col gap-4">
+        <div>
+          <h2 className="text-lg font-bold">{selected.username}</h2>
+          <span
+            className={cn(
+              "inline-block border px-1.5 py-0.5 text-xs font-medium",
+              selected.role === "admin" ?
+                "border-blue-700 bg-blue-100 text-blue-800"
+              : "border-muted-foreground bg-muted text-muted-foreground"
+            )}
+          >
+            {selected.role}
+          </span>
+        </div>
+
+        {canChangePassword && (
+          <form onSubmit={onChangePassword} className="flex flex-col gap-2">
+            <h3 className="text-sm font-medium text-foreground">
+              Change Password
+            </h3>
+            <div className="flex items-end gap-2">
+              <TextField
+                value={password}
+                onChange={onPasswordChange}
+                type="password"
+                className="flex flex-1 flex-col gap-1"
+              >
+                <Label className="text-sm font-medium text-foreground">
+                  New Password
+                </Label>
+                <Input className="border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring" />
+              </TextField>
+              <Button
+                type="submit"
+                isDisabled={savingPassword}
+                className="cursor-pointer border border-foreground bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-xs hover:bg-primary/90 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none disabled:opacity-50"
+              >
+                {savingPassword ? "Saving..." : "Update"}
+              </Button>
+            </div>
+            {passwordError && (
+              <span className="text-sm text-destructive">{passwordError}</span>
+            )}
+            {passwordSuccess && (
+              <span className="text-sm text-green-700">Password updated</span>
+            )}
+          </form>
+        )}
+
+        {isAdmin && selected.id !== currentUserId && (
+          <div>
+            <ConfirmDialog
+              title="Delete User"
+              description="Are you sure you want to delete this user? This cannot be undone."
+              confirmLabel="Delete"
+              onConfirm={onDelete}
+            >
+              <Button className="cursor-pointer border border-destructive bg-destructive/10 px-4 py-2 text-sm font-medium text-destructive shadow-xs hover:bg-destructive/20 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none">
+                Delete User
+              </Button>
+            </ConfirmDialog>
+          </div>
+        )}
+
+        <div>
+          <h3 className="mb-1 text-sm font-medium text-foreground">
+            Active Sessions ({sessions.length})
+          </h3>
+          {sessions.length > 0 ?
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border text-left">
+                    <th className="px-2 py-1 font-medium">ID</th>
+                    <th className="px-2 py-1 font-medium">Created</th>
+                    {canManageSessions && (
+                      <th className="px-2 py-1 font-medium" />
+                    )}
+                  </tr>
+                </thead>
+                <tbody>
+                  {sessions.map((s) => (
+                    <tr key={s.id} className="border-b border-border">
+                      <td className="px-2 py-1">{s.id}</td>
+                      <td className="px-2 py-1">
+                        {new Date(s.createdAt).toLocaleString()}
+                      </td>
+                      {canManageSessions && (
+                        <td className="px-2 py-1">
+                          <ConfirmDialog
+                            title="Revoke Session"
+                            description="Are you sure you want to revoke this session?"
+                            confirmLabel="Revoke"
+                            onConfirm={() => onDeleteSession(s.id)}
+                          >
+                            <Button className="cursor-pointer text-xs text-destructive hover:underline">
+                              Revoke
+                            </Button>
+                          </ConfirmDialog>
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          : <p className="text-sm text-muted-foreground">No active sessions</p>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 interface UserRow {
   id: number;
   username: string;
@@ -147,6 +295,31 @@ export default function Users() {
     }
   }
 
+  const paneContent =
+    selected ?
+      <UserDetailPane
+        selected={selected}
+        isAdmin={isAdmin}
+        currentUserId={currentUserId}
+        canChangePassword={!!canChangePassword}
+        canManageSessions={!!canManageSessions}
+        password={password}
+        onPasswordChange={(v) => {
+          setPassword(v);
+          setPasswordSuccess(false);
+        }}
+        passwordError={passwordError}
+        passwordSuccess={passwordSuccess}
+        savingPassword={savingPassword}
+        onChangePassword={handleChangePassword}
+        onDelete={handleDelete}
+        sessions={sessions}
+        onDeleteSession={handleDeleteSession}
+      />
+    : <div className="flex flex-1 items-center justify-center border border-border text-muted-foreground">
+        Select a user to view details
+      </div>;
+
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-bold">Users</h1>
@@ -248,150 +421,15 @@ export default function Users() {
         </div>
 
         {!isMobile && (
-          <div className="flex w-1/2 flex-col gap-2">
-            {selected ?
-              <DetailPane />
-            : <div className="flex flex-1 items-center justify-center border border-border text-muted-foreground">
-                Select a user to view details
-              </div>
-            }
-          </div>
+          <div className="flex w-1/2 flex-col gap-2">{paneContent}</div>
         )}
       </div>
 
       {isMobile && (
         <Drawer open={selected != null} onClose={() => setSelectedId(null)}>
-          {selected && <DetailPane />}
+          {paneContent}
         </Drawer>
       )}
     </div>
   );
-
-  function DetailPane() {
-    if (!selected) return null;
-    return (
-      <div className="min-h-0 flex-1 overflow-y-auto border border-input p-4 md:border">
-        <div className="flex flex-col gap-4">
-          <div>
-            <h2 className="text-lg font-bold">{selected.username}</h2>
-            <span
-              className={cn(
-                "inline-block border px-1.5 py-0.5 text-xs font-medium",
-                selected.role === "admin" ?
-                  "border-blue-700 bg-blue-100 text-blue-800"
-                : "border-muted-foreground bg-muted text-muted-foreground"
-              )}
-            >
-              {selected.role}
-            </span>
-          </div>
-
-          {canChangePassword && (
-            <form
-              onSubmit={handleChangePassword}
-              className="flex flex-col gap-2"
-            >
-              <h3 className="text-sm font-medium text-foreground">
-                Change Password
-              </h3>
-              <div className="flex items-end gap-2">
-                <TextField
-                  value={password}
-                  onChange={(v) => {
-                    setPassword(v);
-                    setPasswordSuccess(false);
-                  }}
-                  type="password"
-                  className="flex flex-1 flex-col gap-1"
-                >
-                  <Label className="text-sm font-medium text-foreground">
-                    New Password
-                  </Label>
-                  <Input className="border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring" />
-                </TextField>
-                <Button
-                  type="submit"
-                  isDisabled={savingPassword}
-                  className="cursor-pointer border border-foreground bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-xs hover:bg-primary/90 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none disabled:opacity-50"
-                >
-                  {savingPassword ? "Saving..." : "Update"}
-                </Button>
-              </div>
-              {passwordError && (
-                <span className="text-sm text-destructive">
-                  {passwordError}
-                </span>
-              )}
-              {passwordSuccess && (
-                <span className="text-sm text-green-700">Password updated</span>
-              )}
-            </form>
-          )}
-
-          {isAdmin && selected.id !== currentUserId && (
-            <div>
-              <ConfirmDialog
-                title="Delete User"
-                description="Are you sure you want to delete this user? This cannot be undone."
-                confirmLabel="Delete"
-                onConfirm={handleDelete}
-              >
-                <Button className="cursor-pointer border border-destructive bg-destructive/10 px-4 py-2 text-sm font-medium text-destructive shadow-xs hover:bg-destructive/20 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none">
-                  Delete User
-                </Button>
-              </ConfirmDialog>
-            </div>
-          )}
-
-          <div>
-            <h3 className="mb-1 text-sm font-medium text-foreground">
-              Active Sessions ({sessions.length})
-            </h3>
-            {sessions.length > 0 ?
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border text-left">
-                      <th className="px-2 py-1 font-medium">ID</th>
-                      <th className="px-2 py-1 font-medium">Created</th>
-                      {canManageSessions && (
-                        <th className="px-2 py-1 font-medium" />
-                      )}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sessions.map((s) => (
-                      <tr key={s.id} className="border-b border-border">
-                        <td className="px-2 py-1">{s.id}</td>
-                        <td className="px-2 py-1">
-                          {new Date(s.createdAt).toLocaleString()}
-                        </td>
-                        {canManageSessions && (
-                          <td className="px-2 py-1">
-                            <ConfirmDialog
-                              title="Revoke Session"
-                              description="Are you sure you want to revoke this session?"
-                              confirmLabel="Revoke"
-                              onConfirm={() => handleDeleteSession(s.id)}
-                            >
-                              <Button className="cursor-pointer text-xs text-destructive hover:underline">
-                                Revoke
-                              </Button>
-                            </ConfirmDialog>
-                          </td>
-                        )}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            : <p className="text-sm text-muted-foreground">
-                No active sessions
-              </p>
-            }
-          </div>
-        </div>
-      </div>
-    );
-  }
 }

@@ -14,6 +14,69 @@ interface ImageItem {
   references: string[];
 }
 
+interface ImageDetailPaneProps {
+  selected: ImageItem;
+  deleting: boolean;
+  onDelete: () => void | Promise<void>;
+}
+
+function ImageDetailPane({
+  selected,
+  deleting,
+  onDelete,
+}: ImageDetailPaneProps) {
+  return (
+    <div className="min-h-0 flex-1 overflow-y-auto border border-input p-4 md:border">
+      <div className="flex flex-col gap-4 text-sm">
+        <img
+          src={`/api/posts/images/${selected.id}`}
+          alt=""
+          className="max-h-64 border border-border object-contain"
+        />
+
+        <div>
+          <span className="font-medium">ID:</span> {selected.id}
+        </div>
+        <div>
+          <span className="font-medium">Type:</span> {selected.mimeType}
+        </div>
+        <div>
+          <span className="font-medium">Created:</span>{" "}
+          {new Date(selected.createdAt).toLocaleString()}
+        </div>
+
+        <div>
+          <span className="font-medium">Referenced by:</span>
+          {selected.references.length > 0 ?
+            <ul className="mt-1 list-inside list-disc text-muted-foreground">
+              {selected.references.map((ref) => (
+                <li key={ref}>{ref}</li>
+              ))}
+            </ul>
+          : <span className="ml-1 text-muted-foreground">
+              No references (orphaned)
+            </span>
+          }
+        </div>
+
+        <ConfirmDialog
+          title="Delete Image"
+          description="Are you sure you want to delete this image?"
+          confirmLabel="Delete"
+          onConfirm={onDelete}
+        >
+          <Button
+            isDisabled={deleting}
+            className="cursor-pointer self-start border border-destructive bg-destructive/10 px-3 py-1.5 text-sm font-medium text-destructive shadow-xs hover:bg-destructive/20 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none disabled:opacity-50"
+          >
+            {deleting ? "Deleting..." : "Delete Image"}
+          </Button>
+        </ConfirmDialog>
+      </div>
+    </div>
+  );
+}
+
 export default function Images() {
   const apiFetch = useApi();
   const isMobile = useIsMobile();
@@ -53,6 +116,17 @@ export default function Images() {
       setDeleting(false);
     }
   }
+
+  const paneContent =
+    selected ?
+      <ImageDetailPane
+        selected={selected}
+        deleting={deleting}
+        onDelete={handleDelete}
+      />
+    : <div className="flex flex-1 items-center justify-center border border-border text-muted-foreground">
+        Select an image to view details
+      </div>;
 
   return (
     <div className="flex flex-col gap-4">
@@ -110,76 +184,15 @@ export default function Images() {
         </div>
 
         {!isMobile && (
-          <div className="flex w-1/2 flex-col gap-2">
-            {selected ?
-              <DetailPane />
-            : <div className="flex flex-1 items-center justify-center border border-border text-muted-foreground">
-                Select an image to view details
-              </div>
-            }
-          </div>
+          <div className="flex w-1/2 flex-col gap-2">{paneContent}</div>
         )}
       </div>
 
       {isMobile && (
         <Drawer open={selected != null} onClose={() => setSelectedId(null)}>
-          {selected && <DetailPane />}
+          {paneContent}
         </Drawer>
       )}
     </div>
   );
-
-  function DetailPane() {
-    if (!selected) return null;
-    return (
-      <div className="min-h-0 flex-1 overflow-y-auto border border-input p-4 md:border">
-        <div className="flex flex-col gap-4 text-sm">
-          <img
-            src={`/api/posts/images/${selected.id}`}
-            alt=""
-            className="max-h-64 border border-border object-contain"
-          />
-
-          <div>
-            <span className="font-medium">ID:</span> {selected.id}
-          </div>
-          <div>
-            <span className="font-medium">Type:</span> {selected.mimeType}
-          </div>
-          <div>
-            <span className="font-medium">Created:</span>{" "}
-            {new Date(selected.createdAt).toLocaleString()}
-          </div>
-
-          <div>
-            <span className="font-medium">Referenced by:</span>
-            {selected.references.length > 0 ?
-              <ul className="mt-1 list-inside list-disc text-muted-foreground">
-                {selected.references.map((ref) => (
-                  <li key={ref}>{ref}</li>
-                ))}
-              </ul>
-            : <span className="ml-1 text-muted-foreground">
-                No references (orphaned)
-              </span>
-            }
-          </div>
-
-          <ConfirmDialog
-            title="Delete Image"
-            description="Are you sure you want to delete this image?"
-            confirmLabel="Delete"
-            onConfirm={handleDelete}
-          >
-            <Button
-              isDisabled={deleting}
-              className="cursor-pointer self-start border border-destructive bg-destructive/10 px-3 py-1.5 text-sm font-medium text-destructive shadow-xs hover:bg-destructive/20 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none disabled:opacity-50"
-            >
-              {deleting ? "Deleting..." : "Delete Image"}
-            </Button>
-          </ConfirmDialog>
-        </div>
-      </div>
-    );
-  }
 }
