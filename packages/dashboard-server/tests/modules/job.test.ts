@@ -42,7 +42,7 @@ describe("Job", () => {
     it("findNextPending skips non-pending jobs", async () => {
       const repo = Container.getInstance(JobRepository);
       const id = await repo.createJob("claimed-test", {});
-      await repo.claimJob(id);
+      await repo.claimJob(id!);
 
       const jobs = await repo.findByType("claimed-test", ["pending"]);
       expect(jobs).toHaveLength(0);
@@ -52,7 +52,7 @@ describe("Job", () => {
       const repo = Container.getInstance(JobRepository);
       const id = await repo.createJob("claim-test", {});
 
-      const claimed = await repo.claimJob(id);
+      const claimed = await repo.claimJob(id!);
       expect(claimed).toBe(true);
 
       const jobs = await repo.findByType("claim-test", ["running"]);
@@ -63,16 +63,16 @@ describe("Job", () => {
       const repo = Container.getInstance(JobRepository);
       const id = await repo.createJob("double-claim", {});
 
-      await repo.claimJob(id);
-      const secondClaim = await repo.claimJob(id);
+      await repo.claimJob(id!);
+      const secondClaim = await repo.claimJob(id!);
       expect(secondClaim).toBe(false);
     });
 
     it("completeJob sets state to completed with output", async () => {
       const repo = Container.getInstance(JobRepository);
       const id = await repo.createJob("complete-test", {});
-      await repo.claimJob(id);
-      await repo.completeJob(id, { result: "ok" });
+      await repo.claimJob(id!);
+      await repo.completeJob(id!, { result: "ok" });
 
       const jobs = await repo.findByType("complete-test", ["completed"]);
       const job = jobs.find((j) => j.id === id);
@@ -83,8 +83,8 @@ describe("Job", () => {
     it("failJob sets state to failed with error output", async () => {
       const repo = Container.getInstance(JobRepository);
       const id = await repo.createJob("fail-test", {});
-      await repo.claimJob(id);
-      await repo.failJob(id, new Error("something broke"));
+      await repo.claimJob(id!);
+      await repo.failJob(id!, new Error("something broke"));
 
       const jobs = await repo.findByType("fail-test", ["failed"]);
       const job = jobs.find((j) => j.id === id);
@@ -96,7 +96,7 @@ describe("Job", () => {
     it("resetStaleJobs resets old running jobs to pending", async () => {
       const repo = Container.getInstance(JobRepository);
       const id = await repo.createJob("stale-test", {});
-      await repo.claimJob(id);
+      await repo.claimJob(id!);
 
       const db = getDb();
       await db.execute({
@@ -114,7 +114,7 @@ describe("Job", () => {
     it("resetStaleJobs does not reset recently-updated running jobs", async () => {
       const repo = Container.getInstance(JobRepository);
       const id = await repo.createJob("not-stale", {});
-      await repo.claimJob(id);
+      await repo.claimJob(id!);
 
       await repo.resetStaleJobs(300_000);
 

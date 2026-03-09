@@ -14,6 +14,10 @@ async function login(creds: { username: string; password: string }) {
   return extractCookie(res)!;
 }
 
+async function json<T = any>(res: Response): Promise<T> {
+  return res.json() as Promise<T>;
+}
+
 describe("Users", () => {
   describe("GET /api/users", () => {
     it("returns 401 when unauthenticated", async () => {
@@ -27,7 +31,7 @@ describe("Users", () => {
         headers: { Cookie: cookie },
       });
       expect(res.status).toBe(200);
-      const users = await res.json();
+      const users = await json<any[]>(res);
       expect(users).toEqual(
         expect.arrayContaining([
           expect.objectContaining({ username: "admin", role: "admin" }),
@@ -59,7 +63,7 @@ describe("Users", () => {
         body: JSON.stringify({ username: "testuser", password: "testpass123" }),
       });
       expect(res.status).toBe(200);
-      const body = await res.json();
+      const body = await json(res);
       expect(body).toHaveProperty("id");
     });
 
@@ -91,7 +95,7 @@ describe("Users", () => {
       const meRes = await fetch(`${getBaseUrl()}/api/auth/me`, {
         headers: { Cookie: cookie },
       });
-      const { userId } = await meRes.json();
+      const { userId } = await json<{ userId: number }>(meRes);
 
       const res = await fetch(`${getBaseUrl()}/api/users/${userId}/password`, {
         method: "PUT",
@@ -132,8 +136,8 @@ describe("Users", () => {
       const usersRes = await fetch(`${getBaseUrl()}/api/users`, {
         headers: { Cookie: cookie },
       });
-      const users = await usersRes.json();
-      const testUser = users.find((u: any) => u.username === "testuser");
+      const users = await json<any[]>(usersRes);
+      const testUser = users.find((u) => u.username === "testuser");
 
       const res = await fetch(
         `${getBaseUrl()}/api/users/${testUser.id}/password`,
@@ -161,16 +165,142 @@ describe("Users", () => {
       const meRes = await fetch(`${getBaseUrl()}/api/auth/me`, {
         headers: { Cookie: cookie },
       });
-      const { userId } = await meRes.json();
+      const { userId } = await json<{ userId: number }>(meRes);
 
       const res = await fetch(`${getBaseUrl()}/api/users/${userId}/sessions`, {
         headers: { Cookie: cookie },
       });
       expect(res.status).toBe(200);
-      const sessions = await res.json();
+      const sessions = await json<any[]>(res);
       expect(sessions.length).toBeGreaterThan(0);
       expect(sessions[0]).toHaveProperty("id");
       expect(sessions[0]).toHaveProperty("createdAt");
+    });
+  });
+
+  describe("DELETE /api/users/:userId/sessions/:sessionId", () => {
+    it("returns 401 when unauthenticated", async () => {
+      const res = await fetch(`${getBaseUrl()}/api/users/1/sessions/1`, {
+        method: "DELETE",
+      });
+      expect(res.status).toBe(401);
+    });
+
+    it("admin can revoke another user's session", async () => {
+      const adminCookie = await login(ADMIN_CREDS);
+      // Get testuser id
+      const usersRes = await fetch(`${getBaseUrl()}/api/users`, {
+        headers: { Cookie: adminCookie },
+      });
+      const users = await json<any[]>(usersRes);
+      const testUser = users.find((u) => u.username === "testuser");
+
+      // Log in as testuser to create a session
+      await login({ username: "testuser", password: "adminset789" });
+
+      // Get testuser's sessions
+      const sessionsRes = await fetch(
+        `${getBaseUrl()}/api/users/${testUser.id}/sessions`,
+        { headers: { Cookie: adminCookie } },
+      );
+      const sessions = await json<any[]>(sessionsRes);
+      expect(sessions.length).toBeGreaterThan(0);
+      const targetSession = sessions[0];
+
+      // Admin revokes it
+      const res = await fetch(
+        `${getBaseUrl()}/api/users/${testUser.id}/sessions/${targetSession.id}`,
+        { method: "DELETE", headers: { Cookie: adminCookie } },
+      );
+      expect(res.status).toBe(200);
+
+      // Session should be gone from the list
+      const afterRes = await fetch(
+        `${getBaseUrl()}/api/users/${testUser.id}/sessions`,
+        { headers: { Cookie: adminCookie } },
+      );
+      const afterSessions = await json<any[]>(afterRes);
+      expect(afterSessions.find((s) => s.id === targetSession.id)).toBeUndefined();
+    });
+
+    it("non-admin can revoke own session", async () => {
+      const testCookie = await login({ username: "testuser", password: "adminset789" });
+      const meRes = await fetch(`${getBaseUrl()}/api/auth/me`, {
+        headers: { Cookie: testCookie },
+      });
+      const { userId } = await json<{ userId: number }>(meRes);
+
+      // Get own sessions
+      const sessionsRes = await fetch(
+        `${getBaseUrl()}/api/users/${userId}/sessions`,
+        { headers: { Cookie: testCookie } },
+      );
+      const sessions = await json<any[]>(sessionsRes);
+      expect(sessions.length).toBeGreaterThan(0);
+      const targetSession = sessions[0];
+
+      // Revoke own session
+      const res = await fetch(
+        `${getBaseUrl()}/api/users/${userId}/sessions/${targetSession.id}`,
+        { method: "DELETE", headers: { Cookie: testCookie } },
+      );
+      expect(res.status).toBe(200);
+    });
+
+    it("non-admin cannot revoke another user's session", async () => {
+      const testCookie = await login({ username: "testuser", password: "adminset789" });
+      // Admin is user id 1, get admin sessions
+      const adminCookie = await login(ADMIN_CREDS);
+      const sessionsRes = await fetch(`${getBaseUrl()}/api/users/1/sessions`, {
+        headers: { Cookie: adminCookie },
+      });
+      const sessions = await json<any[]>(sessionsRes);
+      expect(sessions.length).toBeGreaterThan(0);
+
+      // Try to revoke admin's session as testuser
+      const res = await fetch(
+        `${getBaseUrl()}/api/users/1/sessions/${sessions[0].id}`,
+        { method: "DELETE", headers: { Cookie: testCookie } },
+      );
+      expect(res.status).toBe(403);
+    });
+
+    it("returns 404 for non-existent session", async () => {
+      const cookie = await login(ADMIN_CREDS);
+      const res = await fetch(`${getBaseUrl()}/api/users/1/sessions/999999`, {
+        method: "DELETE",
+        headers: { Cookie: cookie },
+      });
+      expect(res.status).toBe(404);
+    });
+
+    it("returns 404 when session belongs to different user", async () => {
+      const adminCookie = await login(ADMIN_CREDS);
+      // Get admin's session
+      const meRes = await fetch(`${getBaseUrl()}/api/auth/me`, {
+        headers: { Cookie: adminCookie },
+      });
+      const { userId: adminId } = await json<{ userId: number }>(meRes);
+      const sessionsRes = await fetch(
+        `${getBaseUrl()}/api/users/${adminId}/sessions`,
+        { headers: { Cookie: adminCookie } },
+      );
+      const sessions = await json<any[]>(sessionsRes);
+      expect(sessions.length).toBeGreaterThan(0);
+
+      // Get testuser id
+      const usersRes = await fetch(`${getBaseUrl()}/api/users`, {
+        headers: { Cookie: adminCookie },
+      });
+      const users = await json<any[]>(usersRes);
+      const testUser = users.find((u) => u.username === "testuser");
+
+      // Try to delete admin's session via testuser's URL
+      const res = await fetch(
+        `${getBaseUrl()}/api/users/${testUser.id}/sessions/${sessions[0].id}`,
+        { method: "DELETE", headers: { Cookie: adminCookie } },
+      );
+      expect(res.status).toBe(404);
     });
   });
 
@@ -198,8 +328,8 @@ describe("Users", () => {
       const usersRes = await fetch(`${getBaseUrl()}/api/users`, {
         headers: { Cookie: cookie },
       });
-      const users = await usersRes.json();
-      const testUser = users.find((u: any) => u.username === "testuser");
+      const users = await json<any[]>(usersRes);
+      const testUser = users.find((u) => u.username === "testuser");
 
       const res = await fetch(`${getBaseUrl()}/api/users/${testUser.id}`, {
         method: "DELETE",
@@ -211,8 +341,8 @@ describe("Users", () => {
       const afterRes = await fetch(`${getBaseUrl()}/api/users`, {
         headers: { Cookie: cookie },
       });
-      const afterUsers = await afterRes.json();
-      expect(afterUsers.find((u: any) => u.username === "testuser")).toBeUndefined();
+      const afterUsers = await json<any[]>(afterRes);
+      expect(afterUsers.find((u) => u.username === "testuser")).toBeUndefined();
     });
   });
 });

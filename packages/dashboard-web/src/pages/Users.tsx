@@ -130,8 +130,21 @@ export default function Users() {
     }
   }
 
-  const canChangePassword =
+  const canManageSessions =
     selected && (isAdmin || selected.id === currentUserId);
+
+  const canChangePassword = canManageSessions;
+
+  async function handleDeleteSession(sessionId: number) {
+    if (!selected) return;
+    const res = await apiFetch(
+      `/api/users/${selected.id}/sessions/${sessionId}`,
+      { method: "DELETE" },
+    );
+    if (res.ok) {
+      setSessions((prev) => prev.filter((s) => s.id !== sessionId));
+    }
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -334,6 +347,9 @@ export default function Users() {
                     <tr className="border-b border-border text-left">
                       <th className="px-2 py-1 font-medium">ID</th>
                       <th className="px-2 py-1 font-medium">Created</th>
+                      {canManageSessions && (
+                        <th className="px-2 py-1 font-medium" />
+                      )}
                     </tr>
                   </thead>
                   <tbody>
@@ -343,6 +359,16 @@ export default function Users() {
                         <td className="px-2 py-1">
                           {new Date(s.createdAt).toLocaleString()}
                         </td>
+                        {canManageSessions && (
+                          <td className="px-2 py-1">
+                            <Button
+                              onPress={() => handleDeleteSession(s.id)}
+                              className="cursor-pointer text-xs text-destructive hover:underline"
+                            >
+                              Revoke
+                            </Button>
+                          </td>
+                        )}
                       </tr>
                     ))}
                   </tbody>

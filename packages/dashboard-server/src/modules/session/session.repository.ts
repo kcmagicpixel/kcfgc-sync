@@ -43,6 +43,24 @@ export class SessionRepository {
     });
   }
 
+  async findById(id: number): Promise<Session | null> {
+    const result = await this.db.execute({
+      sql: `SELECT id, session_id as sessionId, user_id as userId, created_at as createdAt, deleted_at as deletedAt
+            FROM session WHERE id = ? AND deleted_at IS NULL`,
+      args: [id],
+    });
+    if (result.rows.length === 0) return null;
+    return Session.parse(result.rows[0]);
+  }
+
+  async deleteById(id: number): Promise<boolean> {
+    const result = await this.db.execute({
+      sql: `UPDATE session SET deleted_at = ? WHERE id = ? AND deleted_at IS NULL`,
+      args: [Date.now(), id],
+    });
+    return result.rowsAffected > 0;
+  }
+
   async findAllByUserId(userId: number): Promise<Session[]> {
     const result = await this.db.execute({
       sql: `SELECT id, session_id as sessionId, user_id as userId, created_at as createdAt, deleted_at as deletedAt

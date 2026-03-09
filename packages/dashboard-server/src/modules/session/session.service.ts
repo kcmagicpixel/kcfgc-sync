@@ -12,8 +12,16 @@ export class SessionService {
     return this.repo.create(sessionId, userId);
   }
 
+  async findById(id: number) {
+    return this.repo.findById(id);
+  }
+
   async destroy(sessionId: string) {
     return this.repo.deleteBySessionId(sessionId);
+  }
+
+  async destroyById(id: number) {
+    return this.repo.deleteById(id);
   }
 
   async destroyAllByUserId(userId: number) {

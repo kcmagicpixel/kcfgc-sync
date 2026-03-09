@@ -41,6 +41,14 @@ export class UserService {
     const sessions = await this.sessionService.findAllByUserId(userId);
     return sessions.map((s) => ({ id: s.id, createdAt: s.createdAt }));
   }
+
+  async findSessionById(sessionId: number) {
+    return this.sessionService.findById(sessionId);
+  }
+
+  async deleteSession(sessionId: number) {
+    return this.sessionService.destroyById(sessionId);
+  }
 }
 
 Container.register(UserService, [UserRepository, SessionService]);

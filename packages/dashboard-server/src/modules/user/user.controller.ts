@@ -106,6 +106,29 @@ export class UserController implements Controller {
         res.json(sessions);
       },
     );
+
+    app.delete(
+      "/api/users/:userId/sessions/:sessionId",
+      this.session.isAuthenticated,
+      async (req, res) => {
+        const targetUserId = Number(req.params.userId);
+        const sessionId = Number(req.params.sessionId);
+        const currentUserId = req.session.userId!;
+
+        if (targetUserId !== currentUserId) {
+          if (!(await this.requireAdmin(req, res))) return;
+        }
+
+        const session = await this.userService.findSessionById(sessionId);
+        if (!session || session.userId !== targetUserId) {
+          res.status(404).json({ error: "Session not found" });
+          return;
+        }
+
+        await this.userService.deleteSession(sessionId);
+        res.json({ ok: true });
+      },
+    );
   }
 }
 

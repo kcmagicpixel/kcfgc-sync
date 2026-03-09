@@ -59,6 +59,45 @@ describe("Session", () => {
       });
       expect(result.rows.length).toBe(1);
     });
+
+    it("finds a session by row id", async () => {
+      const repo = Container.getInstance(SessionRepository);
+      await repo.create("repo-test-find-id", 1);
+
+      const allSessions = await repo.findAllByUserId(1);
+      const target = allSessions.find((s) => s.sessionId === "repo-test-find-id")!;
+
+      const found = await repo.findById(target.id);
+      expect(found).not.toBeNull();
+      expect(found!.sessionId).toBe("repo-test-find-id");
+      expect(found!.userId).toBe(1);
+    });
+
+    it("returns null for findById with non-existent id", async () => {
+      const repo = Container.getInstance(SessionRepository);
+      const session = await repo.findById(999999);
+      expect(session).toBeNull();
+    });
+
+    it("soft-deletes a session by row id", async () => {
+      const repo = Container.getInstance(SessionRepository);
+      await repo.create("repo-test-delete-id", 1);
+
+      const allSessions = await repo.findAllByUserId(1);
+      const target = allSessions.find((s) => s.sessionId === "repo-test-delete-id")!;
+
+      const deleted = await repo.deleteById(target.id);
+      expect(deleted).toBe(true);
+
+      const found = await repo.findById(target.id);
+      expect(found).toBeNull();
+    });
+
+    it("returns false when deleting a non-existent session by id", async () => {
+      const repo = Container.getInstance(SessionRepository);
+      const deleted = await repo.deleteById(999999);
+      expect(deleted).toBe(false);
+    });
   });
 
   describe("SessionService", () => {
@@ -86,6 +125,20 @@ describe("Session", () => {
 
       const session = await service.findBySessionId("svc-test-destroy");
       expect(session).toBeNull();
+    });
+
+    it("destroys a session by row id", async () => {
+      const service = Container.getInstance(SessionService);
+      await service.create("svc-test-destroy-id", 1);
+
+      const found = await service.findBySessionId("svc-test-destroy-id");
+      expect(found).not.toBeNull();
+
+      const deleted = await service.destroyById(found!.id);
+      expect(deleted).toBe(true);
+
+      const after = await service.findById(found!.id);
+      expect(after).toBeNull();
     });
   });
 });
