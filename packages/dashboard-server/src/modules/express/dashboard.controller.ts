@@ -7,13 +7,30 @@ import { Container } from "#container";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// TODO: Also return extra handlers for routes
-const paths: string[] = [];
+/** This list must contain ever route in the frontend, so that we can send the html on page reload. */
+const frontendRoutes: string[] = [
+  "/login",
+  "/jobs",
+  "/jobs/new",
+  "/tournaments",
+  "/posts",
+  "/posts/new",
+  "/posts/images",
+  "/posts/replacements",
+  "/users",
+];
 
 export class DashboardController implements Controller {
   async register(app: Application) {
     if (process.env["NODE_ENV"] === "production") {
       app.use(express.static(path.join(__dirname, "../../../public/web")));
+      for (const route of frontendRoutes) {
+        app.get(route, function sendIndexHtml(req, res) {
+          return res.sendFile(
+            path.join(__dirname, "../../../public/web/index.html")
+          );
+        });
+      }
     } else {
       const { createServer } = await import("vite");
       const vite = await createServer({
