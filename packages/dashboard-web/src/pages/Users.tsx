@@ -152,11 +152,14 @@ export default function Users() {
       <h1 className="text-2xl font-bold">Users</h1>
 
       {isAdmin && (
-        <form onSubmit={handleCreate} className="flex items-end gap-2">
+        <form
+          onSubmit={handleCreate}
+          className="flex flex-wrap items-end gap-2"
+        >
           <TextField
             value={newUsername}
             onChange={setNewUsername}
-            className="flex flex-col gap-1"
+            className="flex md:min-w-0 flex-1 flex-col gap-1"
           >
             <Label className="text-sm font-medium text-foreground">
               Username
@@ -167,7 +170,7 @@ export default function Users() {
             value={newPassword}
             onChange={setNewPassword}
             type="password"
-            className="flex flex-col gap-1"
+            className="flex md:min-w-0 flex-1 flex-col gap-1"
           >
             <Label className="text-sm font-medium text-foreground">
               Password
@@ -182,7 +185,9 @@ export default function Users() {
             {creating ? "Creating..." : "Create User"}
           </Button>
           {createError && (
-            <span className="text-sm text-destructive">{createError}</span>
+            <span className="w-full text-sm text-destructive">
+              {createError}
+            </span>
           )}
         </form>
       )}
