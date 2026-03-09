@@ -5,6 +5,7 @@ import { useApi } from "../libs/hooks/use-api.hook";
 import { cn } from "../libs/utils/cn.util";
 import { resizeImage } from "../libs/utils/resize-image.util";
 import { Drawer } from "../components/Drawer";
+import { ConfirmDialog } from "../components/ConfirmDialog";
 import { useIsMobile } from "../libs/hooks/use-is-mobile.hook";
 
 interface PostPayload {
@@ -715,13 +716,19 @@ export default function Posts() {
                     Edit
                   </Button>
                 )}
-                <Button
-                  onPress={handleDelete}
-                  isDisabled={deleting || selected.job.state === "running"}
-                  className="cursor-pointer border border-destructive bg-destructive/10 px-3 py-1.5 text-sm font-medium text-destructive shadow-xs hover:bg-destructive/20 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none disabled:opacity-50"
+                <ConfirmDialog
+                  title="Delete Post"
+                  description="Are you sure you want to delete this post?"
+                  confirmLabel="Delete"
+                  onConfirm={handleDelete}
                 >
-                  {deleting ? "Deleting..." : "Delete Post"}
-                </Button>
+                  <Button
+                    isDisabled={deleting || selected.job.state === "running"}
+                    className="cursor-pointer border border-destructive bg-destructive/10 px-3 py-1.5 text-sm font-medium text-destructive shadow-xs hover:bg-destructive/20 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none disabled:opacity-50"
+                  >
+                    {deleting ? "Deleting..." : "Delete Post"}
+                  </Button>
+                </ConfirmDialog>
               </div>
             </>
           }

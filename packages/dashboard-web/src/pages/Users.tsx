@@ -4,6 +4,7 @@ import { useApi } from "../libs/hooks/use-api.hook";
 import { useAuth } from "../libs/hooks/use-auth.hook";
 import { cn } from "../libs/utils/cn.util";
 import { Drawer } from "../components/Drawer";
+import { ConfirmDialog } from "../components/ConfirmDialog";
 import { useIsMobile } from "../libs/hooks/use-is-mobile.hook";
 
 interface UserRow {
@@ -327,12 +328,16 @@ export default function Users() {
 
           {isAdmin && selected.id !== currentUserId && (
             <div>
-              <Button
-                onPress={handleDelete}
-                className="cursor-pointer border border-destructive bg-destructive/10 px-4 py-2 text-sm font-medium text-destructive shadow-xs hover:bg-destructive/20 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none"
+              <ConfirmDialog
+                title="Delete User"
+                description="Are you sure you want to delete this user? This cannot be undone."
+                confirmLabel="Delete"
+                onConfirm={handleDelete}
               >
-                Delete User
-              </Button>
+                <Button className="cursor-pointer border border-destructive bg-destructive/10 px-4 py-2 text-sm font-medium text-destructive shadow-xs hover:bg-destructive/20 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none">
+                  Delete User
+                </Button>
+              </ConfirmDialog>
             </div>
           )}
 
@@ -361,12 +366,16 @@ export default function Users() {
                         </td>
                         {canManageSessions && (
                           <td className="px-2 py-1">
-                            <Button
-                              onPress={() => handleDeleteSession(s.id)}
-                              className="cursor-pointer text-xs text-destructive hover:underline"
+                            <ConfirmDialog
+                              title="Revoke Session"
+                              description="Are you sure you want to revoke this session?"
+                              confirmLabel="Revoke"
+                              onConfirm={() => handleDeleteSession(s.id)}
                             >
-                              Revoke
-                            </Button>
+                              <Button className="cursor-pointer text-xs text-destructive hover:underline">
+                                Revoke
+                              </Button>
+                            </ConfirmDialog>
                           </td>
                         )}
                       </tr>

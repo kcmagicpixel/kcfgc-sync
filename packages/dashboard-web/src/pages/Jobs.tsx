@@ -5,6 +5,7 @@ import { useApi } from "../libs/hooks/use-api.hook";
 import { cn } from "../libs/utils/cn.util";
 import { MultiSelect } from "../components/MultiSelect";
 import { Drawer } from "../components/Drawer";
+import { ConfirmDialog } from "../components/ConfirmDialog";
 import { useIsMobile } from "../libs/hooks/use-is-mobile.hook";
 import {
   JOB_STATES,
@@ -77,17 +78,22 @@ export default function Jobs() {
   const detailContent = selected && (
     <>
       {selected.state === "pending" && (
-        <Button
-          onPress={async () => {
+        <ConfirmDialog
+          title="Cancel Job"
+          description="Are you sure you want to cancel this job?"
+          confirmLabel="Cancel Job"
+          variant="default"
+          onConfirm={async () => {
             const res = await apiFetch(`/api/jobs/${selected.id}/cancel`, {
               method: "POST",
             });
             if (res.ok) refreshJobs();
           }}
-          className="ml-auto cursor-pointer self-start border border-foreground bg-primary px-2 py-1 text-xs font-medium text-primary-foreground shadow-xs hover:bg-primary/90 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none"
         >
-          Cancel Job
-        </Button>
+          <Button className="ml-auto cursor-pointer self-start border border-foreground bg-primary px-2 py-1 text-xs font-medium text-primary-foreground shadow-xs hover:bg-primary/90 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none">
+            Cancel Job
+          </Button>
+        </ConfirmDialog>
       )}
       <div className="flex flex-1 flex-col gap-1">
         <label className="text-sm font-medium text-foreground">Payload</label>

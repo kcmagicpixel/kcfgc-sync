@@ -4,6 +4,7 @@ import { Button } from "react-aria-components";
 import { useApi } from "../libs/hooks/use-api.hook";
 import { cn } from "../libs/utils/cn.util";
 import { Drawer } from "../components/Drawer";
+import { ConfirmDialog } from "../components/ConfirmDialog";
 import { useIsMobile } from "../libs/hooks/use-is-mobile.hook";
 
 interface ImageItem {
@@ -164,13 +165,19 @@ export default function Images() {
             }
           </div>
 
-          <Button
-            onPress={handleDelete}
-            isDisabled={deleting}
-            className="cursor-pointer self-start border border-destructive bg-destructive/10 px-3 py-1.5 text-sm font-medium text-destructive shadow-xs hover:bg-destructive/20 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none disabled:opacity-50"
+          <ConfirmDialog
+            title="Delete Image"
+            description="Are you sure you want to delete this image?"
+            confirmLabel="Delete"
+            onConfirm={handleDelete}
           >
-            {deleting ? "Deleting..." : "Delete Image"}
-          </Button>
+            <Button
+              isDisabled={deleting}
+              className="cursor-pointer self-start border border-destructive bg-destructive/10 px-3 py-1.5 text-sm font-medium text-destructive shadow-xs hover:bg-destructive/20 pressed:translate-x-px pressed:translate-y-px pressed:shadow-none disabled:opacity-50"
+            >
+              {deleting ? "Deleting..." : "Delete Image"}
+            </Button>
+          </ConfirmDialog>
         </div>
       </div>
     );
