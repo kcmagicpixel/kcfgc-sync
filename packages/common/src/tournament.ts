@@ -121,7 +121,7 @@ export const loadTournament = withRetry(
         return {
           id: event.id,
           name: event.name,
-          entrantCount: event.numEntrants,
+          entrantCount: event.numEntrants || 0,
           startDate: DateTime.fromSeconds(event.startAt)
             .setZone(timezone)
             .toISO(),
