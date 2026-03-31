@@ -2,8 +2,8 @@ import { loadHub } from "@emily-curry/fgc-sync-common";
 import { z } from "zod";
 import { Container } from "#container";
 import { Log } from "#log";
-import { JobRepository } from "../job/job.repository.js";
 import type { Worker } from "../worker.model.js";
+import { TournamentWorker } from "./tournament.worker.js";
 
 const HubPayload = z.object({
   slug: z.string(),
@@ -14,7 +14,7 @@ export class HubWorker implements Worker {
   readonly jobType = "hub";
   private readonly log = Log.child({ module: "HubWorker" });
 
-  constructor(private readonly jobRepo: JobRepository) {}
+  constructor(private readonly tournamentWorker: TournamentWorker) {}
 
   async handle(payload: unknown): Promise<unknown> {
     const { slug, limit } = HubPayload.parse(payload);
@@ -25,11 +25,11 @@ export class HubWorker implements Worker {
     );
 
     for (const tournament of hub.tournaments) {
-      await this.jobRepo.createJob("tournament", { slug: tournament.slug });
+      await this.tournamentWorker.handle({ slug: tournament.slug });
     }
 
     return { created: hub.tournaments.length };
   }
 }
 
-Container.register(HubWorker, [JobRepository]);
+Container.register(HubWorker, [TournamentWorker]);
