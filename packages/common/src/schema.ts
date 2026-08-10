@@ -14,7 +14,7 @@ export const GGStreamSchema = z.object({
   streamId: z.string(),
   logo: z.string().optional(),
   name: z.string(),
-  source: z.enum(["TWITCH"]),
+  source: z.enum(["TWITCH", "YOUTUBE"]),
 });
 
 export const GGVideogameSchema = z.object({
